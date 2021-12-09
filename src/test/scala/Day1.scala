@@ -1,7 +1,3 @@
-// using scala 3.1.1-RC1
-// using option -source:future
-// using lib org.scalameta::munit::0.7.29
-
 class Day1 extends munit.FunSuite:
 
   val sample = List(199, 200, 208, 210, 200, 207, 240, 269, 260, 263)

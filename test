@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-
-# we have only test sources and no main sources so we need
-# to redundantly specify the Scala version for the main sources
-# or it defaults to 3.0.2
-
-scala-cli test -S 3.1.1-RC1 *.scala
