@@ -12,6 +12,7 @@ class Day1 extends munit.FunSuite:
 
   // Part 1
 
+  @annotation.nowarn("msg=match may not be exhaustive")
   def increases(xs: List[Int]): Int =
     xs.sliding(2).count {
       case List(prev, cur) =>
