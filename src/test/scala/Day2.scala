@@ -27,16 +27,18 @@ class Day2 extends munit.FunSuite:
       case Down(n)    => p.copy(depth = p.depth + n)
       case Up(n)      => p.copy(depth = p.depth - n)
 
-  test("part 1 sample") {
+  def navigate1(cmds: IterableOnce[Command]): Position1 =
     val initial = Position1(0, 0)
-    val finalPos = sample.foldLeft(initial)(move1)
+    cmds.foldLeft(initial)(move1)
+
+  test("part 1 sample") {
+    val finalPos = navigate1(sample)
     assertEquals(finalPos.horiz * finalPos.depth, 150)
   }
 
   test("part 1 real") {
-    val initial = Position1(0, 0)
     val input = io.Source.fromFile("day2.txt").getLines.map(parse)
-    val finalPos = input.foldLeft(initial)(move1)
+    val finalPos = navigate1(input)
     assertEquals(finalPos.horiz * finalPos.depth, 1636725)
   }
 
@@ -50,16 +52,19 @@ class Day2 extends munit.FunSuite:
       case Down(n)    => p.copy(aim = p.aim + n)
       case Up(n)      => p.copy(aim = p.aim - n)
 
-  test("part 2 sample") {
+  def navigate2(cmds: IterableOnce[Command]): Position2 =
     val initial = Position2(0, 0, 0)
-    val finalPos = sample.foldLeft(initial)(move2)
+    cmds.foldLeft(initial)(move2)
+
+  test("part 2 sample") {
+    val finalPos = navigate2(sample)
     assertEquals(finalPos.horiz * finalPos.depth, 900)
   }
 
   test("part 2 real") {
     val initial = Position2(0, 0, 0)
     val input = io.Source.fromFile("day2.txt").getLines.map(parse)
-    val finalPos = input.foldLeft(initial)(move2)
+    val finalPos = navigate2(input)
     assertEquals(finalPos.horiz * finalPos.depth, 1872757425)
   }
 
