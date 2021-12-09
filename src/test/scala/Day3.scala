@@ -10,11 +10,11 @@ class Day3 extends munit.FunSuite:
   // Part 1
 
   def mostCommonBit(chars: Seq[Char]): Char =
-    if (chars.count(_ == '1') * 2 >= chars.size)
+    if chars.count(_ == '1') * 2 >= chars.size
     then '1' else '0'
 
   def flip(bit: Char): Char =
-    if (bit == '0')
+    if bit == '0'
     then '1' else '0'
 
   def powerConsumption(xs: List[String]): Int =
@@ -38,14 +38,14 @@ class Day3 extends munit.FunSuite:
   def oxygenRating(xs: List[String], index: Int = 0): Int =
     val bit = mostCommonBit(xs.map(_(index)))
     val keep = xs.filter(_(index) == bit)
-    if (keep.size == 1)
+    if keep.size == 1
     then fromBinary(keep.head)
     else oxygenRating(keep, index + 1)
 
   def scrubberRating(xs: List[String], index: Int = 0): Int =
     val bit = flip(mostCommonBit(xs.map(_(index))))
     val keep = xs.filter(_(index) == bit)
-    if (keep.size == 1)
+    if keep.size == 1
     then fromBinary(keep.head)
     else scrubberRating(keep, index + 1)
 
