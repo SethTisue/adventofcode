@@ -12,13 +12,30 @@ class Day1 extends munit.FunSuite:
       remaining = rest
     result.toList
 
+  // part 1
+
   def mostTotalCalories(elves: List[Elf]): Int =
     elves.map(_.meals.sum).max
 
-  test("day 1 sample") {
+  test("day 1 part 1 sample") {
     assertEquals(24000, mostTotalCalories(getInput("day1-sample.txt")))
   }
 
-  test("day 1") {
+  test("day 1 part 1") {
     assertEquals(71471, mostTotalCalories(getInput("day1.txt")))
   }
+
+  // part 2
+
+  def topThreeTotalCalories(elves: List[Elf]): Int =
+    elves.map(_.meals.sum).sorted.takeRight(3).sum
+
+  test("day 1 part 2 sample") {
+    assertEquals(45000, topThreeTotalCalories(getInput("day1-sample.txt")))
+  }
+
+  test("day 1 part 2") {
+    assertEquals(211189, topThreeTotalCalories(getInput("day1.txt")))
+  }
+
+end Day1
