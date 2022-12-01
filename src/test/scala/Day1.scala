@@ -3,14 +3,10 @@ class Day1 extends munit.FunSuite:
   case class Elf(meals: List[Int])
 
   def getInput(name: String): List[Elf] =
-    val result = collection.mutable.ListBuffer.empty[Elf]
-    var remaining = io.Source.fromResource(name).getLines
-    while remaining.hasNext do
-      val (elf, rest) = remaining.span(_.nonEmpty)
-      result += Elf(elf.map(_.toInt).toList)
-      if rest.hasNext then rest.next()
-      remaining = rest
-    result.toList
+    io.Source.fromResource(name)
+      .mkString.split("\n\n").toList
+      .map(section =>
+        Elf(section.split('\n').map(_.toInt).toList))
 
   // part 1
 
