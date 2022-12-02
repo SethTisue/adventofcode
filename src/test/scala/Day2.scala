@@ -50,6 +50,8 @@ class Day2 extends munit.FunSuite:
       Play.score(response) + Outcome.score(outcome(play, response))
     }.sum
 
+  // part 1 tests
+
   test("day 2 part 1 sample") {
     assertEquals(15, scorePart1(getInputPart1("day2-sample.txt")))
   }
@@ -71,12 +73,6 @@ class Day2 extends munit.FunSuite:
       .toList
 
   def scorePart2(rounds: List[Part2Round]): Int =
-    def roundScore(p: Play, o: Outcome): Int = (p, o) match
-      case _                           => 0
-    def outcomeScore(o: Outcome): Int = o match
-      case Outcome.Lose => 0
-      case Outcome.Draw => 3
-      case Outcome.Win  => 6
     def chooseResponse(p: Play, o: Outcome): Play = (p, o) match
       case (_, Outcome.Draw) => p
       case (Play.Rock, Outcome.Win) => Play.Paper
@@ -85,12 +81,13 @@ class Day2 extends munit.FunSuite:
       case (Play.Paper, Outcome.Lose) => Play.Rock
       case (Play.Scissors, Outcome.Win) => Play.Rock
       case (Play.Scissors, Outcome.Lose) => Play.Paper
-
     rounds.map{
       case Part2Round(play, outcome) =>
         val response = chooseResponse(play, outcome)
-        Play.score(response) + outcomeScore(outcome)
+        Play.score(response) + Outcome.score(outcome)
     }.sum
+
+  // part 2 tests
 
   test("day 2 part 1 sample") {
     assertEquals(12, scorePart2(getInputPart2("day2-sample.txt")))
