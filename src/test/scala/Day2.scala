@@ -90,11 +90,11 @@ class Day2 extends munit.FunSuite:
 
   // part 2 tests
 
-  test("day 2 part 1 sample") {
+  test("day 2 part 2 sample") {
     assertEquals(12, scorePart2(getInputPart2("day2-sample.txt")))
   }
 
-  test("day 2 part 1") {
+  test("day 2 part 2") {
     assertEquals(16098, scorePart2(getInputPart2("day2.txt")))
   }
 
