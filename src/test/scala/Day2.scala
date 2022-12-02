@@ -13,6 +13,10 @@ class Day2 extends munit.FunSuite:
       case Play.Rock     => 1
       case Play.Paper    => 2
       case Play.Scissors => 3
+    def beats(p: Play): Play =
+      Play.fromOrdinal((p.ordinal + 1) % Play.values.size)
+    def losesTo(p: Play): Play =
+      Play.fromOrdinal((p.ordinal + Play.values.size - 1) % Play.values.size)
 
   enum Outcome:
     case Lose, Draw, Win
@@ -41,12 +45,13 @@ class Day2 extends munit.FunSuite:
       .toList
 
   def scorePart1(rounds: List[Part1Round]): Int =
-    def outcome(p1: Play, p2: Play): Outcome = (p1, p2) match
-      case (Play.Rock, Play.Paper)     => Outcome.Win
-      case (Play.Paper, Play.Scissors) => Outcome.Win
-      case (Play.Scissors, Play.Rock)  => Outcome.Win
-      case _ if p1 == p2               => Outcome.Draw
-      case _                           => Outcome.Lose
+    def outcome(p1: Play, p2: Play): Outcome =
+      if p1 == p2 then
+        Outcome.Draw
+      else if p2 == Play.beats(p1) then
+        Outcome.Win
+      else
+        Outcome.Lose
     rounds.map{case Part1Round(play, response) =>
       Play.score(response) + Outcome.score(outcome(play, response))
     }.sum
@@ -75,14 +80,10 @@ class Day2 extends munit.FunSuite:
       .toList
 
   def scorePart2(rounds: List[Part2Round]): Int =
-    def chooseResponse(p: Play, o: Outcome): Play = (p, o) match
-      case (_, Outcome.Draw) => p
-      case (Play.Rock, Outcome.Win) => Play.Paper
-      case (Play.Rock, Outcome.Lose) => Play.Scissors
-      case (Play.Paper, Outcome.Win) => Play.Scissors
-      case (Play.Paper, Outcome.Lose) => Play.Rock
-      case (Play.Scissors, Outcome.Win) => Play.Rock
-      case (Play.Scissors, Outcome.Lose) => Play.Paper
+    def chooseResponse(p: Play, o: Outcome): Play = o match
+      case Outcome.Draw => p
+      case Outcome.Win => Play.beats(p)
+      case Outcome.Lose => Play.losesTo(p)
     rounds.map{
       case Part2Round(p, o) =>
         Play.score(chooseResponse(p, o)) + Outcome.score(o)
