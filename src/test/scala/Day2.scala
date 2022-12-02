@@ -29,6 +29,7 @@ class Day2 extends munit.FunSuite:
   // part 1
 
   case class Part1Round(play: Play, response: Play)
+
   def getInputPart1(name: String): List[Part1Round] =
     io.Source.fromResource(name)
       .getLines
@@ -63,6 +64,7 @@ class Day2 extends munit.FunSuite:
   // part 2
 
   case class Part2Round(play: Play, outcome: Outcome)
+
   def getInputPart2(name: String): List[Part2Round] =
     io.Source.fromResource(name)
       .getLines
@@ -82,9 +84,8 @@ class Day2 extends munit.FunSuite:
       case (Play.Scissors, Outcome.Win) => Play.Rock
       case (Play.Scissors, Outcome.Lose) => Play.Paper
     rounds.map{
-      case Part2Round(play, outcome) =>
-        val response = chooseResponse(play, outcome)
-        Play.score(response) + Outcome.score(outcome)
+      case Part2Round(p, o) =>
+        Play.score(chooseResponse(p, o)) + Outcome.score(o)
     }.sum
 
   // part 2 tests
