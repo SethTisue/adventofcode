@@ -15,8 +15,8 @@ class Day2 extends munit.FunSuite:
       case s"up $n"      => Up(n.toInt)
       case s"down $n"    => Down(n.toInt)
 
-  val sample =
-    List("forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2")
+  def sample =
+    Iterator("forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2")
       .map(parse)
 
   // Part 1
@@ -27,7 +27,7 @@ class Day2 extends munit.FunSuite:
       case Down(n)    => p.copy(depth = p.depth + n)
       case Up(n)      => p.copy(depth = p.depth - n)
 
-  def navigate1(cmds: IterableOnce[Command]): Position1 =
+  def navigate1(cmds: Iterator[Command]): Position1 =
     val initial = Position1(0, 0)
     cmds.foldLeft(initial)(move1)
 
@@ -52,7 +52,7 @@ class Day2 extends munit.FunSuite:
       case Down(n)    => p.copy(aim = p.aim + n)
       case Up(n)      => p.copy(aim = p.aim - n)
 
-  def navigate2(cmds: IterableOnce[Command]): Position2 =
+  def navigate2(cmds: Iterator[Command]): Position2 =
     val initial = Position2(0, 0, 0)
     cmds.foldLeft(initial)(move2)
 
