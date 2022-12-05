@@ -1,6 +1,6 @@
 import util.chaining.*
 
-class Day5 extends munit.FunSuite:
+class Day05 extends munit.FunSuite:
 
   type Stack = List[Char]
 
@@ -42,25 +42,25 @@ class Day5 extends munit.FunSuite:
   // part 1 tests
 
   test("day 5 part 1 sample") {
-    val (stacks, moves) = getInput("day5-sample.txt")
+    val (stacks, moves) = getInput("day05-sample.txt")
     assertEquals("CMZ", solve(stacks, moves, withReversing = true))
   }
 
   test("day 5 part 1") {
-    val (stacks, moves) = getInput("day5.txt")
+    val (stacks, moves) = getInput("day05.txt")
     assertEquals("FRDSQRRCD", solve(stacks, moves, withReversing = true))
   }
 
   // part 2 tests
 
   test("day 5 part 2 sample") {
-    val (stacks, moves) = getInput("day5-sample.txt")
+    val (stacks, moves) = getInput("day05-sample.txt")
     assertEquals("MCD", solve(stacks, moves, withReversing = false))
   }
 
   test("day 5 part 2") {
-    val (stacks, moves) = getInput("day5.txt")
+    val (stacks, moves) = getInput("day05.txt")
     assertEquals("HRFTQVWNN", solve(stacks, moves, withReversing = false))
   }
 
-end Day5
+end Day05

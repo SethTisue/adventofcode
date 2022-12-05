@@ -1,4 +1,4 @@
-class Day1 extends munit.FunSuite:
+class Day01 extends munit.FunSuite:
 
   case class Elf(meals: List[Int])
 
@@ -14,11 +14,11 @@ class Day1 extends munit.FunSuite:
     elves.map(_.meals.sum).max
 
   test("day 1 part 1 sample") {
-    assertEquals(24000, mostTotalCalories(getInput("day1-sample.txt")))
+    assertEquals(24000, mostTotalCalories(getInput("day01-sample.txt")))
   }
 
   test("day 1 part 1") {
-    assertEquals(71471, mostTotalCalories(getInput("day1.txt")))
+    assertEquals(71471, mostTotalCalories(getInput("day01.txt")))
   }
 
   // part 2
@@ -27,11 +27,11 @@ class Day1 extends munit.FunSuite:
     elves.map(_.meals.sum).sorted.takeRight(3).sum
 
   test("day 1 part 2 sample") {
-    assertEquals(45000, topThreeTotalCalories(getInput("day1-sample.txt")))
+    assertEquals(45000, topThreeTotalCalories(getInput("day01-sample.txt")))
   }
 
   test("day 1 part 2") {
-    assertEquals(211189, topThreeTotalCalories(getInput("day1.txt")))
+    assertEquals(211189, topThreeTotalCalories(getInput("day01.txt")))
   }
 
-end Day1
+end Day01
