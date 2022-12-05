@@ -2,8 +2,6 @@ import util.chaining.*
 
 class Day5 extends munit.FunSuite:
 
-  // shared code
-
   type Stack = List[Char]
 
   case class Move(crates: Int, src: Int, dest: Int)
@@ -11,8 +9,6 @@ class Day5 extends munit.FunSuite:
     def fromString(s: String): Move = s match
       case s"move $crates from $src to $dest" =>
         Move(crates.toInt, src.toInt, dest.toInt)
-
-  // part 1
 
   def getInput(name: String): (List[Stack], List[Move]) =
     val lines =
@@ -27,25 +23,43 @@ class Day5 extends munit.FunSuite:
         .transpose.map(_.dropWhile(_ == ' '))
     (stacks, movesLines.map(Move.fromString))
 
-  def solve(stacks: List[Stack], moves: List[Move]): String =
+  def solve(stacks: List[Stack], moves: List[Move], withReversing: Boolean): String =
     moves match
       case Nil =>
         stacks.map(_.head).mkString
       case move :: more =>
+        val cratesMoved =
+          stacks(move.src - 1)
+            .take(move.crates)
+            .pipe(if withReversing then _.reverse else identity)
         val newStacks =
           stacks
             .updated(move.src - 1, stacks(move.src - 1).drop(move.crates))
-            .updated(move.dest - 1, stacks(move.src - 1).take(move.crates).reverse ::: stacks(move.dest - 1))
-        solve(newStacks, more)
+            .updated(move.dest - 1, cratesMoved ::: stacks(move.dest - 1))
+        solve(newStacks, more, withReversing)
 
   // part 1 tests
 
   test("day 5 part 1 sample") {
-    assertEquals("CMZ", Function.tupled(solve)(getInput("day5-sample.txt")))
+    val (stacks, moves) = getInput("day5-sample.txt")
+    assertEquals("CMZ", solve(stacks, moves, withReversing = true))
   }
 
   test("day 5 part 1") {
-    assertEquals("FRDSQRRCD", Function.tupled(solve)(getInput("day5.txt")))
+    val (stacks, moves) = getInput("day5.txt")
+    assertEquals("FRDSQRRCD", solve(stacks, moves, withReversing = true))
+  }
+
+  // part 2 tests
+
+  test("day 5 part 2 sample") {
+    val (stacks, moves) = getInput("day5-sample.txt")
+    assertEquals("MCD", solve(stacks, moves, withReversing = false))
+  }
+
+  test("day 5 part 2") {
+    val (stacks, moves) = getInput("day5.txt")
+    assertEquals("HRFTQVWNN", solve(stacks, moves, withReversing = false))
   }
 
 end Day5
