@@ -1,4 +1,4 @@
-class Day3 extends munit.FunSuite:
+class Day03 extends munit.FunSuite:
 
   val sample =
     List("00100", "11110", "10110", "10111", "10101", "01111",
@@ -29,7 +29,7 @@ class Day3 extends munit.FunSuite:
   }
 
   test("part 1 real") {
-    val input = io.Source.fromFile("day3.txt").getLines.toList
+    val input = io.Source.fromFile("day03.txt").getLines.toList
     assertEquals(powerConsumption(input), 4139586)
   }
 
@@ -54,8 +54,8 @@ class Day3 extends munit.FunSuite:
   }
 
   test("part 2 real") {
-    val input = io.Source.fromFile("day3.txt").getLines.toList
+    val input = io.Source.fromFile("day03.txt").getLines.toList
     assertEquals(oxygenRating(input) * scrubberRating(input), 1800151)
   }
 
-end Day3
+end Day03

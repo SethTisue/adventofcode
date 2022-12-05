@@ -1,4 +1,4 @@
-class Day4 extends munit.FunSuite:
+class Day04 extends munit.FunSuite:
 
   type Board = List[Int]
 
@@ -49,12 +49,12 @@ class Day4 extends munit.FunSuite:
     wins.flatten.head
 
   test("part 1 sample") {
-    val input = readInput(io.Source.fromFile("day4-sample.txt").getLines)
+    val input = readInput(io.Source.fromFile("day04-sample.txt").getLines)
     assertEquals(play(input)._2, 4512)
   }
 
   test("part 1 real") {
-    val input = readInput(io.Source.fromFile("day4.txt").getLines)
+    val input = readInput(io.Source.fromFile("day04.txt").getLines)
     assertEquals(play(input)._2, 58412)
   }
 
@@ -70,13 +70,13 @@ class Day4 extends munit.FunSuite:
       play2(input.copy(boards = input.boards.filterNot(_ == board)))
 
   test("part 2 sample") {
-    val input = readInput(io.Source.fromFile("day4-sample.txt").getLines)
+    val input = readInput(io.Source.fromFile("day04-sample.txt").getLines)
     assertEquals(play2(input), 1924)
   }
 
   test("part 2 real") {
-    val input = readInput(io.Source.fromFile("day4.txt").getLines)
+    val input = readInput(io.Source.fromFile("day04.txt").getLines)
     assertEquals(play2(input), 10030)
   }
 
-end Day4
+end Day04

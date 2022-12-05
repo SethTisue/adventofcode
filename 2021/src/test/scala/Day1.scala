@@ -1,4 +1,4 @@
-class Day1 extends munit.FunSuite:
+class Day01 extends munit.FunSuite:
 
   val sample = List(199, 200, 208, 210, 200, 207, 240, 269, 260, 263)
 
@@ -24,7 +24,7 @@ class Day1 extends munit.FunSuite:
   }
 
   test("part 1 real") {
-    assertEquals(increases(intsFromFile("day1.txt")), 1713)
+    assertEquals(increases(intsFromFile("day01.txt")), 1713)
   }
 
   // Part 2
@@ -38,7 +38,7 @@ class Day1 extends munit.FunSuite:
   }
 
   test("part 2 real") {
-    assertEquals(sliding3Increases(intsFromFile("day1.txt")), 1734)
+    assertEquals(sliding3Increases(intsFromFile("day01.txt")), 1734)
   }
 
-end Day1
+end Day01

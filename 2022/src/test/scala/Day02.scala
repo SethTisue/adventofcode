@@ -1,4 +1,4 @@
-class Day2 extends munit.FunSuite:
+class Day02 extends munit.FunSuite:
 
   // shared code
 
@@ -59,11 +59,11 @@ class Day2 extends munit.FunSuite:
   // part 1 tests
 
   test("day 2 part 1 sample") {
-    assertEquals(15, scorePart1(getInputPart1("day2-sample.txt")))
+    assertEquals(15, scorePart1(getInputPart1("day02-sample.txt")))
   }
 
   test("day 2 part 1") {
-    assertEquals(15572, scorePart1(getInputPart1("day2.txt")))
+    assertEquals(15572, scorePart1(getInputPart1("day02.txt")))
   }
 
   // part 2
@@ -92,11 +92,11 @@ class Day2 extends munit.FunSuite:
   // part 2 tests
 
   test("day 2 part 2 sample") {
-    assertEquals(12, scorePart2(getInputPart2("day2-sample.txt")))
+    assertEquals(12, scorePart2(getInputPart2("day02-sample.txt")))
   }
 
   test("day 2 part 2") {
-    assertEquals(16098, scorePart2(getInputPart2("day2.txt")))
+    assertEquals(16098, scorePart2(getInputPart2("day02.txt")))
   }
 
-end Day2
+end Day02
