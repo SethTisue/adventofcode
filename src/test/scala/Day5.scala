@@ -4,11 +4,12 @@ class Day5 extends munit.FunSuite:
 
   type Stack = List[Char]
 
+  // 0-indexed, even though input is 1-indexed
   case class Move(crates: Int, src: Int, dest: Int)
   object Move:
     def fromString(s: String): Move = s match
       case s"move $crates from $src to $dest" =>
-        Move(crates.toInt, src.toInt, dest.toInt)
+        Move(crates.toInt, src.toInt - 1, dest.toInt - 1)
 
   def getInput(name: String): (List[Stack], List[Move]) =
     val lines =
@@ -29,13 +30,13 @@ class Day5 extends munit.FunSuite:
         stacks.map(_.head).mkString
       case move :: more =>
         val cratesMoved =
-          stacks(move.src - 1)
+          stacks(move.src)
             .take(move.crates)
             .pipe(if withReversing then _.reverse else identity)
         val newStacks =
           stacks
-            .updated(move.src - 1, stacks(move.src - 1).drop(move.crates))
-            .updated(move.dest - 1, cratesMoved ::: stacks(move.dest - 1))
+            .updated(move.src, stacks(move.src).drop(move.crates))
+            .updated(move.dest, cratesMoved ::: stacks(move.dest))
         solve(newStacks, more, withReversing)
 
   // part 1 tests
