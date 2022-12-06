@@ -5,13 +5,9 @@ class Day06 extends munit.FunSuite:
       .getLines
 
   def solve(message: String, window: Int): Int =
-   message
-    .sliding(window)
-    .zipWithIndex
-    .collectFirst{
-      case (s, i) if s.distinct.size == window =>
-        i + window}
-    .get
+    message.sliding(window)
+      .indexWhere(_.distinct.size == window)
+      + window
 
   // part 1 tests
 
