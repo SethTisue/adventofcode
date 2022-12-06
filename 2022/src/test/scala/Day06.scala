@@ -8,8 +8,10 @@ class Day06 extends munit.FunSuite:
    message
     .sliding(window)
     .zipWithIndex
-    .find{case (s, i) => s.distinct.size == window}
-    .get._2 + window
+    .collectFirst{
+      case (s, i) if s.distinct.size == window =>
+        i + window}
+    .get
 
   // part 1 tests
 
