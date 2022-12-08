@@ -4,12 +4,6 @@ class Day08 extends munit.FunSuite:
 
   type Forest = Vector[Vector[Int]]
 
-  def getInput(name: String): Forest =
-    io.Source.fromResource(name)
-      .getLines
-      .map(_.map(_.toString.toInt).toVector)
-      .toVector
-
   def allCoords(forest: Forest): IndexedSeq[(Int, Int)] =
     for y <- forest.indices
         x <- forest(y).indices
@@ -50,7 +44,12 @@ class Day08 extends munit.FunSuite:
 
   def testDay8(name: String, file: String, solver: Forest => Int, answer: Int) =
     test(s"day 8 $name") {
-      assertEquals(solver(getInput(file)), answer)
+      val forest =
+        io.Source.fromResource(file)
+          .getLines
+          .map(_.map(_.toString.toInt).toVector)
+          .toVector
+      assertEquals(solver(forest), answer)
     }
 
   testDay8("part 1 sample", "day08-sample.txt", visibleCount, 21)
