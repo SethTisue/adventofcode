@@ -2,14 +2,6 @@ import collection.mutable.ListBuffer
 
 class Day07 extends munit.FunSuite:
 
-  // file handling
-
-  def getInput(name: String): List[Command] =
-    io.Source.fromResource(name)
-      .getLines
-      .map(Command.fromString)
-      .toList
-
   // data model & parsing: directory tree
 
   enum Node:
@@ -17,7 +9,7 @@ class Day07 extends munit.FunSuite:
     case File(name: String, size: Long)
   object Node:
     def fromString(s: String) = s match
-      case s"dir $name" => Node.Directory(name, ListBuffer.empty)
+      case s"dir $name" => Node.Directory(name)
       case s"$size $name" => Node.File(name, size.toLong)
 
   def totalSize(e: Node): Long = e match
@@ -38,26 +30,27 @@ class Day07 extends munit.FunSuite:
 
   // interpreter
 
-  def runCommands(lines: List[Command], dirs: List[Node.Directory]): Unit =
+  def run(lines: List[Command], dirs: List[Node.Directory]): Unit =
     lines match
-      case Nil =>
+      case Nil => // done
       case line :: more =>
         line match
           case Command.Cd("/") =>
-            runCommands(more, List(dirs.last))
+            run(more, List(dirs.last))
           case Command.Cd("..") =>
-            runCommands(more, dirs.tail)
+            run(more, dirs.tail)
           case Command.Cd(dest) =>
-            val newCwd = dirs.head.children.collectFirst{
-              case dir @ Node.Directory(`dest`, _) => dir
-            }.get
-            runCommands(more, newCwd :: dirs)
+            val newCwd =
+              dirs.head.children.collectFirst{
+                case dir @ Node.Directory(`dest`, _) => dir
+              }.get
+            run(more, newCwd :: dirs)
           case Command.Ls =>
             val (outputLines, more2) = more.span(_.isInstanceOf[Command.Output])
-            for Command.Output(s) <- outputLines.map(_.asInstanceOf[Command.Output])
-            do dirs.head.children += Node.fromString(s)
-            runCommands(more2, dirs)
-          case _ =>
+            for Command.Output(s) <- outputLines.map(_.asInstanceOf[Command.Output]) do
+              dirs.head.children += Node.fromString(s)
+            run(more2, dirs)
+          case _: Command.Output =>
             throw new IllegalStateException(line.toString)
 
   // part 1 code
@@ -77,16 +70,18 @@ class Day07 extends munit.FunSuite:
   def solve2(root: Node.Directory): Long =
     val sizeNeeded = totalSize(root) - 40000000L
     def allSubdirs(root: Node.Directory): Iterator[Node.Directory] =
-      Iterator(root) ++ root.children.collect{case d: Node.Directory => d}.iterator.flatMap(allSubdirs)
+      Iterator(root) ++
+        root.children.collect{case d: Node.Directory => d}
+          .iterator.flatMap(allSubdirs)
     allSubdirs(root).map(totalSize).filter(_ >= sizeNeeded).min
 
   // tests
 
   def testDay7(name: String, filename: String, solver: Node.Directory => Long, answer: Long) =
     test(s"day 7 $name") {
-      val lines = getInput(filename)
+      val lines = io.Source.fromResource(filename).getLines.map(Command.fromString).toList
       val root: Node.Directory = Node.Directory("/")
-      runCommands(lines, List(root))
+      run(lines, List(root))
       assertEquals(solver(root), answer)
     }
 
