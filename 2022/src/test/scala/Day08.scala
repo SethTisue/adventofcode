@@ -31,7 +31,7 @@ class Day08 extends munit.FunSuite:
     def viewingDistance(heights: IndexedSeq[Int]): Int =
       val shorter = heights.takeWhile(_ < height)
       if shorter.size == heights.size
-      then heights.size
+      then shorter.size
       else shorter.size + 1
     viewCross(x, y, forest).map(viewingDistance).product
 
