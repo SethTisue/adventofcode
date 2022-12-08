@@ -12,17 +12,17 @@ class Day07 extends munit.FunSuite:
 
   // data model & parsing: directory tree
 
-  enum Entry:
-    case Directory(name: String, entries: ListBuffer[Entry] = ListBuffer.empty)
+  enum Node:
+    case Directory(name: String, children: ListBuffer[Node] = ListBuffer.empty)
     case File(name: String, size: Long)
-  object Entry:
+  object Node:
     def fromString(s: String) = s match
-      case s"dir $name" => Entry.Directory(name, ListBuffer.empty)
-      case s"$size $name" => Entry.File(name, size.toLong)
+      case s"dir $name" => Node.Directory(name, ListBuffer.empty)
+      case s"$size $name" => Node.File(name, size.toLong)
 
-  def totalSize(e: Entry): Long = e match
-    case d: Entry.Directory => d.entries.map(totalSize).sum
-    case Entry.File(_, size) => size
+  def totalSize(e: Node): Long = e match
+    case d: Node.Directory => d.children.map(totalSize).sum
+    case Node.File(_, size) => size
 
   // data model & parsing: commands
 
@@ -38,7 +38,7 @@ class Day07 extends munit.FunSuite:
 
   // interpreter
 
-  def runCommands(lines: List[Command], dirs: List[Entry.Directory]): Unit =
+  def runCommands(lines: List[Command], dirs: List[Node.Directory]): Unit =
     lines match
       case Nil =>
       case line :: more =>
@@ -48,68 +48,51 @@ class Day07 extends munit.FunSuite:
           case Command.Cd("..") =>
             runCommands(more, dirs.tail)
           case Command.Cd(dest) =>
-            val newCwd = dirs.head.entries.collectFirst{
-              case dir @ Entry.Directory(`dest`, _) => dir
+            val newCwd = dirs.head.children.collectFirst{
+              case dir @ Node.Directory(`dest`, _) => dir
             }.get
             runCommands(more, newCwd :: dirs)
           case Command.Ls =>
             val (outputLines, more2) = more.span(_.isInstanceOf[Command.Output])
             for Command.Output(s) <- outputLines.map(_.asInstanceOf[Command.Output])
-            do dirs.head.entries += Entry.fromString(s)
+            do dirs.head.children += Node.fromString(s)
             runCommands(more2, dirs)
           case _ =>
             throw new IllegalStateException(line.toString)
 
   // part 1 code
 
-  def solve1(root: Entry.Directory): Long =
+  def solve1(root: Node.Directory): Long =
     var sum = 0L
-    def recurse(dir: Entry.Directory): Unit =
+    def recurse(dir: Node.Directory): Unit =
       val size = totalSize(dir)
       if size <= 100000L then
         sum += size
-      dir.entries.collect{case d: Entry.Directory => d}.foreach(recurse)
+      dir.children.collect{case d: Node.Directory => d}.foreach(recurse)
     recurse(root)
     sum
 
   // part 2 code
 
-  def solve2(root: Entry.Directory): Long =
+  def solve2(root: Node.Directory): Long =
     val sizeNeeded = totalSize(root) - 40000000L
-    def allSubdirs(root: Entry.Directory): Iterator[Entry.Directory] =
-      Iterator(root) ++ root.entries.collect{case d: Entry.Directory => d}.iterator.flatMap(allSubdirs)
+    def allSubdirs(root: Node.Directory): Iterator[Node.Directory] =
+      Iterator(root) ++ root.children.collect{case d: Node.Directory => d}.iterator.flatMap(allSubdirs)
     allSubdirs(root).map(totalSize).filter(_ >= sizeNeeded).min
 
-  // part 1 tests
+  // tests
 
-  test("day 7 part 1 sample") {
-    val lines = getInput("day07-sample.txt")
-    val root: Entry.Directory = Entry.Directory("/")
-    runCommands(lines, List(root))
-    assertEquals(95437L, solve1(root))
-  }
+  def testDay7(name: String, filename: String, solver: Node.Directory => Long, answer: Long) =
+    test(s"day 7 $name") {
+      val lines = getInput(filename)
+      val root: Node.Directory = Node.Directory("/")
+      runCommands(lines, List(root))
+      assertEquals(solver(root), answer)
+    }
 
-  test("day 7 part 1") {
-    val lines = getInput("day07.txt")
-    val root: Entry.Directory = Entry.Directory("/")
-    runCommands(lines, List(root))
-    assertEquals(1243729L, solve1(root))
-  }
-
-  // part 2 tests
-
-  test("day 7 part 2 sample") {
-    val lines = getInput("day07-sample.txt")
-    val root: Entry.Directory = Entry.Directory("/")
-    runCommands(lines, List(root))
-    assertEquals(24933642L, solve2(root))
-  }
-
-  test("day 7 part 2") {
-    val lines = getInput("day07.txt")
-    val root: Entry.Directory = Entry.Directory("/")
-    runCommands(lines, List(root))
-    assertEquals(4443914L, solve2(root))
-  }
+  testDay7("part 1 sample", "day07-sample.txt", solve1, 95437L)
+  testDay7("part 1",        "day07.txt",        solve1, 1243729L)
+  testDay7("part 2 sample", "day07-sample.txt", solve2, 24933642L)
+  testDay7("part 2",        "day07.txt",        solve2, 4443914L)
 
 end Day07
