@@ -19,8 +19,10 @@ class Day07 extends munit.FunSuite:
   import Node.*
 
   def totalSize(e: Node): Long = e match
-    case d: Directory => d.children.map(totalSize).sum
-    case File(_, size) => size
+    case Directory(_, children) =>
+      children.map(totalSize).sum
+    case File(_, size) =>
+      size
 
   def allSubdirs(root: Directory): Iterator[Directory] =
     Iterator(root) ++
