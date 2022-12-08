@@ -10,39 +10,39 @@ class Day08 extends munit.FunSuite:
       .map(_.map(_.toString.toInt).toVector)
       .toVector
 
-  def allTrees(forest: Forest): Vector[(Int, Int)] =
-    for y <- forest.indices.toVector
+  def allIndices(forest: Forest): IndexedSeq[(Int, Int)] =
+    for y <- forest.indices
         x <- forest(y).indices
     yield (x, y)
 
-  // part 1
-
-  def isVisible(x: Int, y: Int, forest: Forest): Boolean =
-    val height = forest(x)(y)
-    (0 to (x - 1)).forall(x0 => forest(x0)(y) < height) ||
-      ((x + 1) until forest.size).forall(x0 => forest(x0)(y) < height) ||
-      (0 to (y - 1)).forall(y0 => forest(x)(y0) < height) ||
-      ((y + 1) until forest.size).forall(y0 => forest(x)(y0) < height)
-
-  def visibleCount(forest: Forest): Int =
-    allTrees(forest).count((x, y) => isVisible(x, y, forest))
-
-  // part 2
-
-  def scenic(x: Int, y: Int, forest: Forest): Int =
+  def viewCross(x: Int, y: Int, forest: Forest): List[IndexedSeq[Int]] =
     val left = (0 to (x - 1)).map(x0 => forest(x0)(y)).reverse
     val right = ((x + 1) until forest.size).map(x0 => forest(x0)(y))
     val up = (0 to (y - 1)).map(y0 => forest(x)(y0)).reverse
     val down = ((y + 1) until forest.size).map(y0 => forest(x)(y0))
+    List(left, right, up, down)
+
+  // part 1
+
+  def visibleCount(forest: Forest): Int =
+    def isVisible(x: Int, y: Int): Boolean =
+      val height = forest(x)(y)
+      viewCross(x, y, forest).exists(_.forall(_ < height))
+    allIndices(forest).count(Function.tupled(isVisible))
+
+  // part 2
+
+  def scenic(x: Int, y: Int, forest: Forest): Int =
     val height = forest(x)(y)
-    def visible(heights: IndexedSeq[Int]): Int =
-      if heights.exists(_ >= height)
-      then heights.takeWhile(_ < height).size + 1
-      else heights.size
-    List(left, right, up, down).map(visible).product
+    def viewingDistance(heights: IndexedSeq[Int]): Int =
+      val shorter = heights.takeWhile(_ < height)
+      if shorter.size == heights.size
+      then heights.size
+      else shorter.size + 1
+    viewCross(x, y, forest).map(viewingDistance).product
 
   def mostScenic(forest: Forest): Int =
-    allTrees(forest)
+    allIndices(forest)
       .map((x, y) => scenic(x, y, forest))
       .max
 
