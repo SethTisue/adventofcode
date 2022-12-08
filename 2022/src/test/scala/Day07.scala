@@ -1,5 +1,7 @@
 class Day07 extends munit.FunSuite:
 
+  // shared code
+
   def getInput(name: String): List[Command] =
     io.Source.fromResource(name)
       .getLines
@@ -59,7 +61,17 @@ class Day07 extends munit.FunSuite:
     val dirs = dir.entries.collect{case d: Entry.Directory => d}
     files.map(_.size).sum + dirs.map(totalSize).sum
 
-  def solve(root: Entry.Directory): Long =
+  def dump(root: Entry, nestingLevel: Int = 0): Unit =
+    println((" " * nestingLevel) + root)
+    root match
+      case d: Entry.Directory => 
+        for e <- d.entries
+        do dump(e, nestingLevel + 2)
+      case _ =>
+
+  // part 1 code
+
+  def solve1(root: Entry.Directory): Long =
     var sum = 0L
     def recurse(dir: Entry.Directory): Unit =
       val size = totalSize(dir)
@@ -71,13 +83,15 @@ class Day07 extends munit.FunSuite:
     // println(s"+++ $sum")
     sum
 
-  def dump(root: Entry, nestingLevel: Int = 0): Unit =
-    println((" " * nestingLevel) + root)
-    root match
-      case d: Entry.Directory => 
-        for e <- d.entries
-        do dump(e, nestingLevel + 2)
-      case _ =>
+  // part 2 code
+
+  def solve2(root: Entry.Directory): Long =
+    val sizeNeeded = totalSize(root) - 40000000L
+    // println(s"*** sizeNeeded = $sizeNeeded")
+    // println(s"*** totalSize(root) = ${totalSize(root)}")
+    def allSubdirs(root: Entry.Directory): Iterator[Entry.Directory] =
+      Iterator(root) ++ root.entries.collect{case d: Entry.Directory => d}.iterator.flatMap(allSubdirs)
+    allSubdirs(root).map(totalSize).filter(_ >= sizeNeeded).min
 
   // part 1 tests
 
@@ -86,14 +100,32 @@ class Day07 extends munit.FunSuite:
     val myRoot = root
     runCommands(lines, List(myRoot))
     // dump(myRoot)
-    assertEquals(95437L, solve(myRoot))
+    assertEquals(95437L, solve1(myRoot))
   }
 
   test("day 7 part 1") {
     val lines = getInput("day07.txt")
     val myRoot = root
     runCommands(lines, List(myRoot))
-    assertEquals(1243729L, solve(myRoot))
+    assertEquals(1243729L, solve1(myRoot))
+  }
+
+  // part 2 tests
+
+  test("day 7 part 2 sample") {
+    val lines = getInput("day07-sample.txt")
+    val myRoot = root
+    runCommands(lines, List(myRoot))
+    // dump(myRoot)
+    assertEquals(24933642L, solve2(myRoot))
+  }
+
+  test("day 7 part 2") {
+    val lines = getInput("day07.txt")
+    val myRoot = root
+    runCommands(lines, List(myRoot))
+    // dump(myRoot)
+    assertEquals(4443914L, solve2(myRoot))
   }
 
 end Day07
