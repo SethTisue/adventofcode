@@ -1,5 +1,9 @@
 import collection.mutable.ListBuffer
 
+// This code is really careless about many times it's recursing
+// over the tree and how many times it's recomputing the same things.
+// Oh well.
+
 class Day07 extends munit.FunSuite:
 
   // data model & parsing: directory tree
