@@ -1,6 +1,8 @@
+import collection.mutable.ListBuffer
+
 class Day07 extends munit.FunSuite:
 
-  // I/O
+  // file handling
 
   def getInput(name: String): List[Command] =
     io.Source.fromResource(name)
@@ -10,22 +12,17 @@ class Day07 extends munit.FunSuite:
 
   // data model & parsing: directory tree
 
-  import collection.mutable.ListBuffer
-
   enum Entry:
-    case Directory(name: String, entries: ListBuffer[Entry])
+    case Directory(name: String, entries: ListBuffer[Entry] = ListBuffer.empty)
     case File(name: String, size: Long)
   object Entry:
     def fromString(s: String) = s match
       case s"dir $name" => Entry.Directory(name, ListBuffer.empty)
       case s"$size $name" => Entry.File(name, size.toLong)
-  def root: Entry.Directory =
-    Entry.Directory("/", ListBuffer())
 
-  def totalSize(dir: Entry.Directory): Long =
-    val files = dir.entries.collect{case f: Entry.File => f}
-    val dirs = dir.entries.collect{case d: Entry.Directory => d}
-    files.map(_.size).sum + dirs.map(totalSize).sum
+  def totalSize(e: Entry): Long = e match
+    case d: Entry.Directory => d.entries.map(totalSize).sum
+    case Entry.File(_, size) => size
 
   // data model & parsing: commands
 
@@ -87,32 +84,32 @@ class Day07 extends munit.FunSuite:
 
   test("day 7 part 1 sample") {
     val lines = getInput("day07-sample.txt")
-    val myRoot = root
-    runCommands(lines, List(myRoot))
-    assertEquals(95437L, solve1(myRoot))
+    val root: Entry.Directory = Entry.Directory("/")
+    runCommands(lines, List(root))
+    assertEquals(95437L, solve1(root))
   }
 
   test("day 7 part 1") {
     val lines = getInput("day07.txt")
-    val myRoot = root
-    runCommands(lines, List(myRoot))
-    assertEquals(1243729L, solve1(myRoot))
+    val root: Entry.Directory = Entry.Directory("/")
+    runCommands(lines, List(root))
+    assertEquals(1243729L, solve1(root))
   }
 
   // part 2 tests
 
   test("day 7 part 2 sample") {
     val lines = getInput("day07-sample.txt")
-    val myRoot = root
-    runCommands(lines, List(myRoot))
-    assertEquals(24933642L, solve2(myRoot))
+    val root: Entry.Directory = Entry.Directory("/")
+    runCommands(lines, List(root))
+    assertEquals(24933642L, solve2(root))
   }
 
   test("day 7 part 2") {
     val lines = getInput("day07.txt")
-    val myRoot = root
-    runCommands(lines, List(myRoot))
-    assertEquals(4443914L, solve2(myRoot))
+    val root: Entry.Directory = Entry.Directory("/")
+    runCommands(lines, List(root))
+    assertEquals(4443914L, solve2(root))
   }
 
 end Day07
