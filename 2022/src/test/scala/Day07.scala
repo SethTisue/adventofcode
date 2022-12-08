@@ -16,6 +16,10 @@ class Day07 extends munit.FunSuite:
     case d: Node.Directory => d.children.map(totalSize).sum
     case Node.File(_, size) => size
 
+  def allSubdirs(root: Node.Directory): Iterator[Node.Directory] =
+    Iterator(root) ++
+      root.children.collect{case d: Node.Directory => d}
+        .iterator.flatMap(allSubdirs)
   // data model & parsing: commands
 
   enum Command:
@@ -56,24 +60,19 @@ class Day07 extends munit.FunSuite:
   // part 1 code
 
   def solve1(root: Node.Directory): Long =
-    var sum = 0L
-    def recurse(dir: Node.Directory): Unit =
-      val size = totalSize(dir)
-      if size <= 100000L then
-        sum += size
-      dir.children.collect{case d: Node.Directory => d}.foreach(recurse)
-    recurse(root)
-    sum
+    allSubdirs(root)
+      .map(totalSize)
+      .filter(_ <= 100000L)
+      .sum
 
   // part 2 code
 
   def solve2(root: Node.Directory): Long =
     val sizeNeeded = totalSize(root) - 40000000L
-    def allSubdirs(root: Node.Directory): Iterator[Node.Directory] =
-      Iterator(root) ++
-        root.children.collect{case d: Node.Directory => d}
-          .iterator.flatMap(allSubdirs)
-    allSubdirs(root).map(totalSize).filter(_ >= sizeNeeded).min
+    allSubdirs(root)
+      .map(totalSize)
+      .filter(_ >= sizeNeeded)
+      .min
 
   // tests
 
