@@ -10,7 +10,7 @@ class Day08 extends munit.FunSuite:
       .map(_.map(_.toString.toInt).toVector)
       .toVector
 
-  def allIndices(forest: Forest): IndexedSeq[(Int, Int)] =
+  def allCoords(forest: Forest): IndexedSeq[(Int, Int)] =
     for y <- forest.indices
         x <- forest(y).indices
     yield (x, y)
@@ -28,7 +28,7 @@ class Day08 extends munit.FunSuite:
     def isVisible(x: Int, y: Int): Boolean =
       val height = forest(x)(y)
       viewCross(x, y, forest).exists(_.forall(_ < height))
-    allIndices(forest).count(Function.tupled(isVisible))
+    allCoords(forest).count(Function.tupled(isVisible))
 
   // part 2
 
@@ -42,7 +42,7 @@ class Day08 extends munit.FunSuite:
     viewCross(x, y, forest).map(viewingDistance).product
 
   def mostScenic(forest: Forest): Int =
-    allIndices(forest)
+    allCoords(forest)
       .map((x, y) => scenic(x, y, forest))
       .max
 
