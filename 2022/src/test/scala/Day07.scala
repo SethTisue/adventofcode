@@ -9,17 +9,20 @@ class Day07 extends munit.FunSuite:
     case File(name: String, size: Long)
   object Node:
     def fromString(s: String) = s match
-      case s"dir $name" => Node.Directory(name)
-      case s"$size $name" => Node.File(name, size.toLong)
+      case s"dir $name" => Directory(name)
+      case s"$size $name" => File(name, size.toLong)
+
+  import Node.*
 
   def totalSize(e: Node): Long = e match
-    case d: Node.Directory => d.children.map(totalSize).sum
-    case Node.File(_, size) => size
+    case d: Directory => d.children.map(totalSize).sum
+    case File(_, size) => size
 
-  def allSubdirs(root: Node.Directory): Iterator[Node.Directory] =
+  def allSubdirs(root: Directory): Iterator[Directory] =
     Iterator(root) ++
-      root.children.collect{case d: Node.Directory => d}
+      root.children.collect{case d: Directory => d}
         .iterator.flatMap(allSubdirs)
+
   // data model & parsing: commands
 
   enum Command:
@@ -34,7 +37,7 @@ class Day07 extends munit.FunSuite:
 
   // interpreter
 
-  def run(lines: List[Command], dirs: List[Node.Directory]): Unit =
+  def run(lines: List[Command], dirs: List[Directory]): Unit =
     lines match
       case Nil => // done
       case line :: more =>
@@ -46,7 +49,7 @@ class Day07 extends munit.FunSuite:
           case Command.Cd(dest) =>
             val newCwd =
               dirs.head.children.collectFirst{
-                case dir @ Node.Directory(`dest`, _) => dir
+                case dir @ Directory(`dest`, _) => dir
               }.get
             run(more, newCwd :: dirs)
           case Command.Ls =>
@@ -59,16 +62,16 @@ class Day07 extends munit.FunSuite:
 
   // part 1 code
 
-  def solve1(root: Node.Directory): Long =
+  def solve1(root: Directory): Long =
     allSubdirs(root)
       .map(totalSize)
-      .filter(_ <= 100000L)
+      .filter(_ <= 100_000L)
       .sum
 
   // part 2 code
 
-  def solve2(root: Node.Directory): Long =
-    val sizeNeeded = totalSize(root) - 40000000L
+  def solve2(root: Directory): Long =
+    val sizeNeeded = totalSize(root) - 40_000_000L
     allSubdirs(root)
       .map(totalSize)
       .filter(_ >= sizeNeeded)
@@ -76,10 +79,10 @@ class Day07 extends munit.FunSuite:
 
   // tests
 
-  def testDay7(name: String, filename: String, solver: Node.Directory => Long, answer: Long) =
+  def testDay7(name: String, file: String, solver: Directory => Long, answer: Long) =
     test(s"day 7 $name") {
-      val lines = io.Source.fromResource(filename).getLines.map(Command.fromString).toList
-      val root: Node.Directory = Node.Directory("/")
+      val lines = io.Source.fromResource(file).getLines.map(Command.fromString).toList
+      val root: Directory = Directory("/")
       run(lines, List(root))
       assertEquals(solver(root), answer)
     }
