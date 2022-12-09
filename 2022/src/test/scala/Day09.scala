@@ -40,20 +40,20 @@ class Day09 extends munit.FunSuite:
       tail = newTail,
       visited = state.visited + newTail.last)
 
-  def finalState(tailSize: Int, moves: Seq[Direction]): State =
-    moves.foldLeft(initialState(tailSize))(nextState)
+  def finalState(tailSize: Int, moves: IterableOnce[Direction]): State =
+    moves.iterator.foldLeft(initialState(tailSize))(nextState)
 
   // tests
 
   def testDay9(name: String, file: String, tailSize: Int, answer: Int) =
     test(s"day 9 $name") {
-      val moves: Seq[Direction] =
+      val moves: Iterator[Direction] =
         io.Source.fromResource(file)
           .getLines
           .flatMap{
             case s"$dir $dist" =>
               List.fill(dist.toInt)(Direction.valueOf(dir))
-          }.toSeq
+          }
       assertEquals(finalState(tailSize, moves).visited.size, answer)
     }
 
