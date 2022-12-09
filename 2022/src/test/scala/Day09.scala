@@ -6,18 +6,20 @@ class Day09 extends munit.FunSuite:
     case L extends Direction(-1,  0)
     case R extends Direction( 1,  0)
 
-  case class Location(x: Int, y: Int):
-    def pullOne(follower: Location): Location =
-      val (dx, dy) = (x - follower.x, y - follower.y)
-      if dx.abs == 2 || dy.abs == 2 then
-        follower.copy(follower.x + dx.sign, follower.y + dy.sign)
-      else
-        follower
-    def pullAll(tail: List[Location]): List[Location] =
-      if tail.isEmpty then Nil
-      else
-        val pulled = pullOne(tail.head)
-        pulled :: pulled.pullAll(tail.tail)
+  case class Location(x: Int, y: Int)
+
+  def pullOne(first: Location, follower: Location): Location =
+    val (dx, dy) = (first.x - follower.x, first.y - follower.y)
+    if dx.abs == 2 || dy.abs == 2 then
+      follower.copy(follower.x + dx.sign, follower.y + dy.sign)
+    else
+      follower
+
+  def pullAll(head: Location, tail: List[Location]): List[Location] =
+    if tail.isEmpty then Nil
+    else
+      val pulled = pullOne(head, tail.head)
+      pulled :: pullAll(pulled, tail.tail)
 
   def run(moves: Iterator[Direction], tailSize: Int): Set[Location] =
     var head = Location(0, 0)
@@ -26,7 +28,7 @@ class Day09 extends munit.FunSuite:
     for move <- moves
     do
       head = head.copy(head.x + move.dx, head.y + move.dy)
-      tail = head.pullAll(tail)
+      tail = pullAll(head, tail)
       visited += tail.last
     visited
 
