@@ -1,29 +1,12 @@
 class Day09 extends munit.FunSuite:
 
-  enum Direction:
-    case Up, Down, Left, Right
-  object Direction:
-    def fromChar(c: Char): Direction =
-      c match
-        case 'U' => Up
-        case 'D' => Down
-        case 'L' => Left
-        case 'R' => Right
-
-  case class Command(direction: Direction, distance: Int)
-  object Command:
-    def fromString(s: String): Command =
-      s match
-       case s"$dir $dist" =>
-         Command(Direction.fromChar(dir(0)), dist.toInt)
+  enum Direction(val dx: Int, val dy: Int):
+    case U extends Direction( 0, -1)
+    case D extends Direction( 0,  1)
+    case L extends Direction(-1,  0)
+    case R extends Direction( 1,  0)
 
   case class Location(x: Int, y: Int):
-    def move(dir: Direction): Location =
-      dir match
-        case Direction.Up    => copy(x, y - 1)
-        case Direction.Down  => copy(x, y + 1)
-        case Direction.Left  => copy(x - 1, y)
-        case Direction.Right => copy(x + 1, y)
     def pullOne(follower: Location): Location =
       val (dx, dy) =
         (x - follower.x, y - follower.y) match
@@ -39,15 +22,14 @@ class Day09 extends munit.FunSuite:
         val pulled = pullOne(tail.head)
         pulled :: pulled.pullAll(tail.tail)
 
-  def run(commands: Seq[Command], tailSize: Int, debug: Boolean = false): Int =
+  def run(moves: Iterator[Direction], tailSize: Int, debug: Boolean = false): Int =
     var head = Location(0, 0)
     var tail = List.fill(tailSize)(head)
     var visited = List(head)
-    for Command(direction, distance) <- commands
-        _ <- 0 until distance
+    for move <- moves
     do
-      if debug then println(direction)
-      head = head.move(direction)
+      if debug then println(move)
+      head = head.copy(head.x + move.dx, head.y + move.dy)
       tail = head.pullAll(tail)
       visited ::= tail.last
       if debug then
@@ -81,12 +63,12 @@ class Day09 extends munit.FunSuite:
 
   def testDay9(name: String, file: String, tailSize: Int, answer: Int) =
     test(s"day 9 $name") {
-      val commands =
+      val moves =
         io.Source.fromResource(file)
           .getLines
-          .map(Command.fromString)
-          .toList
-      assertEquals(run(commands, tailSize), answer)
+          .flatMap{case s"$dir $dist" =>
+            List.fill(dist.toInt)(Direction.valueOf(dir))}
+      assertEquals(run(moves, tailSize), answer)
     }
 
   testDay9("part 1 sample",   "day09-sample1.txt", 1, 13  )
