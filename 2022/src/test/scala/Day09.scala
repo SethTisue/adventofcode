@@ -8,14 +8,11 @@ class Day09 extends munit.FunSuite:
 
   case class Location(x: Int, y: Int):
     def pullOne(follower: Location): Location =
-      val (dx, dy) =
-        (x - follower.x, y - follower.y) match
-          case ( 2, dy) => (      1,  dy.sign)
-          case (-2, dy) => (     -1,  dy.sign)
-          case (dx,  2) => (dx.sign,        1)
-          case (dx, -2) => (dx.sign,       -1)
-          case _        => (      0,        0)
-      follower.copy(follower.x + dx, follower.y + dy)
+      val (dx, dy) = (x - follower.x, y - follower.y)
+      if dx.abs == 2 || dy.abs == 2 then
+        follower.copy(follower.x + dx.sign, follower.y + dy.sign)
+      else
+        follower
     def pullAll(tail: List[Location]): List[Location] =
       if tail.isEmpty then Nil
       else
@@ -37,7 +34,7 @@ class Day09 extends munit.FunSuite:
 
   def testDay9(name: String, file: String, tailSize: Int, answer: Int) =
     test(s"day 9 $name") {
-      val moves: List[Direction] =
+      val moves: Iterator[Direction] =
         io.Source.fromResource(file)
           .getLines
           .flatMap{case s"$dir $dist" =>
