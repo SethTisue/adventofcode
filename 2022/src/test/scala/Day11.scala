@@ -35,39 +35,32 @@ class Day11 extends munit.FunSuite:
 
   def runMonkeys(monkeys: collection.mutable.IndexedSeq[Monkey], divisor: Int, rounds: Int): Long =
     val modulus = monkeys.map(_.divisibleBy).product
-    for round <- 1 to rounds do
-      for (m, i) <- monkeys.zipWithIndex do
-        for item <- m.items do
-          m.inspected += 1
-          val newWorryLevel = m.operation(item)
-          val reducedWorryLevel = (newWorryLevel / divisor) % modulus
-          if reducedWorryLevel % m.divisibleBy == 0 then
-            monkeys(m.trueMonkey).items :+= reducedWorryLevel
-          else
-            monkeys(m.falseMonkey).items :+= reducedWorryLevel
-        m.items = Nil
-    monkeys.map(_.inspected).sorted.takeRight(2).map(_.toLong).product
+    for round <- 1 to rounds
+        (m, i) <- monkeys.zipWithIndex do
+      for item <- m.items do
+        m.inspected += 1
+        val newWorryLevel = m.operation(item)
+        val reducedWorryLevel = (newWorryLevel / divisor) % modulus
+        val nextMonkey =
+          if reducedWorryLevel % m.divisibleBy == 0
+          then m.trueMonkey else m.falseMonkey
+        monkeys(nextMonkey).items :+= reducedWorryLevel
+      m.items = Nil
+    monkeys.map(_.inspected).sorted.takeRight(2)
+      .map(_.toLong).product
 
-  // part 1 tests
+  // testing
 
-  def testDay11Part1(name: String, file: String, expected: Long) =
+  def testDay11(name: String, file: String, divisor: Int, rounds: Int, expected: Long) =
     test(s"day 11 $name") {
       val input = getInput(file).to(collection.mutable.IndexedSeq)
-      assertEquals(runMonkeys(input, divisor = 3, rounds = 20), expected)
+      assertEquals(runMonkeys(input, divisor, rounds), expected)
     }
 
-  testDay11Part1("part 1 sample", "day11-sample.txt", 10605)
-  testDay11Part1("part 1",        "day11.txt",        78960)
+  testDay11("part 1 sample", "day11-sample.txt", 3, 20, 10605)
+  testDay11("part 1",        "day11.txt",        3, 20, 78960)
 
-  // part 2 tests
-
-  def testDay11Part2(name: String, file: String, expected: Long) =
-    test(s"day 11 $name") {
-      val input = getInput(file).to(collection.mutable.IndexedSeq)
-      assertEquals(runMonkeys(input, divisor = 1, rounds = 10000), expected)
-    }
-
-  testDay11Part2("part 2 sample", "day11-sample.txt", 2713310158L)
-  testDay11Part2("part 2",        "day11.txt",        14561971968L)
+  testDay11("part 2 sample", "day11-sample.txt", 1, 10000, 2713310158L)
+  testDay11("part 2",        "day11.txt",        1, 10000, 14561971968L)
 
 end Day11
