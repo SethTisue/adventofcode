@@ -7,7 +7,7 @@ class Day11 extends munit.FunSuite:
 
   case class Behavior(
     operation: Long => Long,
-    divisibleBy: Int,
+    divisor: Int,
     trueMonkey: Int,
     falseMonkey: Int
   )
@@ -35,22 +35,22 @@ class Day11 extends munit.FunSuite:
         items = lines(1) match { case s"  Starting items: $items" => items.split(", ").map(_.toLong).toList },
         behavior = Behavior(
           operation = lines(2) match { case s"  Operation: new = $op" => Behavior.parseOperation(op) },
-          divisibleBy = lines(3) match { case s"  Test: divisible by $n" => n.toInt },
+          divisor = lines(3) match { case s"  Test: divisible by $n" => n.toInt },
           trueMonkey = lines(4) match { case s"    If true: throw to monkey $n" => n.toInt },
           falseMonkey = lines(5) match { case s"    If false: throw to monkey $n" => n.toInt }
         ))
 
-  def runMonkeys(monkeys: IndexedSeq[Monkey], divisor: Int, rounds: Int): Long =
-    val modulus = monkeys.map(_.behavior.divisibleBy).product
+  def runMonkeys(monkeys: IndexedSeq[Monkey], worryReduction: Int, rounds: Int): Long =
+    val modulus = monkeys.map(_.behavior.divisor).product
     for round <- 1 to rounds
         (m, i) <- monkeys.zipWithIndex do
       for item <- m.items do
         m.inspected += 1
-        val newWorryLevel = m.behavior.operation(item)
-        val reducedWorryLevel = (newWorryLevel / divisor) % modulus
+        val reducedWorryLevel = (m.behavior.operation(item) / worryReduction) % modulus
         val nextMonkey =
-          if reducedWorryLevel % m.behavior.divisibleBy == 0
-          then m.behavior.trueMonkey else m.behavior.falseMonkey
+          if reducedWorryLevel % m.behavior.divisor == 0
+          then m.behavior.trueMonkey
+          else m.behavior.falseMonkey
         monkeys(nextMonkey).items :+= reducedWorryLevel
       m.items = Nil
     monkeys.map(_.inspected).sorted.takeRight(2)
@@ -65,9 +65,9 @@ class Day11 extends munit.FunSuite:
       .map(section => Monkey.fromString(section.split('\n')))
       .to(IndexedSeq)
 
-  def testDay11(name: String, file: String, divisor: Int, rounds: Int, expected: Long) =
+  def testDay11(name: String, file: String, worryReduction: Int, rounds: Int, expected: Long) =
     test(s"day 11 $name") {
-      assertEquals(runMonkeys(getInput(file), divisor, rounds), expected)
+      assertEquals(runMonkeys(getInput(file), worryReduction, rounds), expected)
     }
 
   testDay11("part 1 sample", "day11-sample.txt", 3, 20, 10605)
