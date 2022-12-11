@@ -1,26 +1,26 @@
 class Day11 extends munit.FunSuite:
 
   case class Monkey(
-    var items: List[Int],
+    var items: List[Long],
     var inspected: Int = 0,
-    operation: Int => Int,
+    operation: Long => Long,
     divisibleBy: Int,
     trueMonkey: Int,
     falseMonkey: Int)
 
   object Monkey:
-    def parseOperation(s: String): Int => Int =
+    def parseOperation(s: String): Long => Long =
       s match
         case s"$left $middle $right" =>
           n =>
-            val op1 = if left  == "old" then n else left.toInt
-            val op2 = if right == "old" then n else right.toInt
+            val op1 = if left  == "old" then n else left.toLong
+            val op2 = if right == "old" then n else right.toLong
             middle match
               case "+" => op1 + op2
               case "*" => op1 * op2
     def fromString(lines: Array[String]): Monkey =
       Monkey(
-        items = lines(1) match { case s"  Starting items: $items" => items.split(", ").map(_.toInt).toList },
+        items = lines(1) match { case s"  Starting items: $items" => items.split(", ").map(_.toLong).toList },
         operation = lines(2) match { case s"  Operation: new = $op" => parseOperation(op) },
         divisibleBy = lines(3) match { case s"  Test: divisible by $n" => n.toInt },
         trueMonkey = lines(4) match { case s"    If true: throw to monkey $n" => n.toInt },
@@ -34,30 +34,18 @@ class Day11 extends munit.FunSuite:
       .map(section => Monkey.fromString(section.split('\n')))
 
   def runMonkeys(monkeys: collection.mutable.IndexedSeq[Monkey], divisor: Int, rounds: Int): Long =
+    val modulus = monkeys.map(_.divisibleBy).product
     for round <- 1 to rounds do
-      println(round)
       for (m, i) <- monkeys.zipWithIndex do
-        // println(s"Monkey $i:")
         for item <- m.items do
           m.inspected += 1
-          // println(s"  Monkey inspects an item with a worry level of $item")
           val newWorryLevel = m.operation(item)
-          // println(s"    Worry level becomes $newWorryLevel.")
-          val reducedWorryLevel = newWorryLevel / divisor
-          // println(s"    Monkey gets bored with item. Worry level is divided by $divisor to $reducedWorryLevel")
+          val reducedWorryLevel = (newWorryLevel / divisor) % modulus
           if reducedWorryLevel % m.divisibleBy == 0 then
             monkeys(m.trueMonkey).items :+= reducedWorryLevel
-            // println(s"    Current worry level is divisible by ${m.divisibleBy}.")
-            // println(s"    Item with worry level $reducedWorryLevel is thrown to monkey ${m.trueMonkey}.")
           else
             monkeys(m.falseMonkey).items :+= reducedWorryLevel
-            // println(s"    Current worry level is not divisible by ${m.divisibleBy}.")
-            // println(s"    Item with worry level $reducedWorryLevel is thrown to monkey ${m.falseMonkey}.")
         m.items = Nil
-      // println(s"After round $round, the monkeys are holding items with these worry levels:")
-      // for (m, i) <- monkeys.zipWithIndex do
-        // println(s"""Monkey $i: ${m.items.mkString(", ")}""")
-      // println()
     monkeys.map(_.inspected).sorted.takeRight(2).map(_.toLong).product
 
   // part 1 tests
@@ -80,6 +68,6 @@ class Day11 extends munit.FunSuite:
     }
 
   testDay11Part2("part 2 sample", "day11-sample.txt", 2713310158L)
-  testDay11Part2("part 2",        "day11.txt",        0)
+  testDay11Part2("part 2",        "day11.txt",        14561971968L)
 
 end Day11
