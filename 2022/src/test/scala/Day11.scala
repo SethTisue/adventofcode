@@ -1,17 +1,17 @@
-// This was so easy/natural to model with mutability -- I don't
-// feel like refactoring it to be purely functional.
+// This was so easy/natural to model with mutability --
+// I don't feel like refactoring it to be purely functional.
 
 class Day11 extends munit.FunSuite:
 
-  case class Monkey(
-    var items: List[Long],
-    var inspected: Int = 0,
+  // this much is immutable
+
+  case class Behavior(
     operation: Long => Long,
     divisibleBy: Int,
     trueMonkey: Int,
-    falseMonkey: Int)
-
-  object Monkey:
+    falseMonkey: Int
+  )
+  object Behavior:
     def parseOperation(s: String): Long => Long =
       s match
         case s"$left $middle $right" =>
@@ -21,26 +21,36 @@ class Day11 extends munit.FunSuite:
             middle match
               case "+" => arg1 + arg2
               case "*" => arg1 * arg2
+
+  // this is mutable
+
+  case class Monkey(
+    behavior: Behavior,
+    var items: List[Long],
+    var inspected: Int = 0
+  )
+  object Monkey:
     def fromString(lines: Array[String]): Monkey =
       Monkey(
         items = lines(1) match { case s"  Starting items: $items" => items.split(", ").map(_.toLong).toList },
-        operation = lines(2) match { case s"  Operation: new = $op" => parseOperation(op) },
-        divisibleBy = lines(3) match { case s"  Test: divisible by $n" => n.toInt },
-        trueMonkey = lines(4) match { case s"    If true: throw to monkey $n" => n.toInt },
-        falseMonkey = lines(5) match { case s"    If false: throw to monkey $n" => n.toInt }
-      )
+        behavior = Behavior(
+          operation = lines(2) match { case s"  Operation: new = $op" => Behavior.parseOperation(op) },
+          divisibleBy = lines(3) match { case s"  Test: divisible by $n" => n.toInt },
+          trueMonkey = lines(4) match { case s"    If true: throw to monkey $n" => n.toInt },
+          falseMonkey = lines(5) match { case s"    If false: throw to monkey $n" => n.toInt }
+        ))
 
-  def runMonkeys(monkeys: collection.mutable.IndexedSeq[Monkey], divisor: Int, rounds: Int): Long =
-    val modulus = monkeys.map(_.divisibleBy).product
+  def runMonkeys(monkeys: IndexedSeq[Monkey], divisor: Int, rounds: Int): Long =
+    val modulus = monkeys.map(_.behavior.divisibleBy).product
     for round <- 1 to rounds
         (m, i) <- monkeys.zipWithIndex do
       for item <- m.items do
         m.inspected += 1
-        val newWorryLevel = m.operation(item)
+        val newWorryLevel = m.behavior.operation(item)
         val reducedWorryLevel = (newWorryLevel / divisor) % modulus
         val nextMonkey =
-          if reducedWorryLevel % m.divisibleBy == 0
-          then m.trueMonkey else m.falseMonkey
+          if reducedWorryLevel % m.behavior.divisibleBy == 0
+          then m.behavior.trueMonkey else m.behavior.falseMonkey
         monkeys(nextMonkey).items :+= reducedWorryLevel
       m.items = Nil
     monkeys.map(_.inspected).sorted.takeRight(2)
@@ -48,16 +58,16 @@ class Day11 extends munit.FunSuite:
 
   // testing
 
-  def getInput(file: String): Iterator[Monkey] =
+  def getInput(file: String): IndexedSeq[Monkey] =
     io.Source.fromResource(file)
       .mkString
-      .split("\n\n").iterator
+      .split("\n\n")
       .map(section => Monkey.fromString(section.split('\n')))
+      .to(IndexedSeq)
 
   def testDay11(name: String, file: String, divisor: Int, rounds: Int, expected: Long) =
     test(s"day 11 $name") {
-      val input = getInput(file).to(collection.mutable.IndexedSeq)
-      assertEquals(runMonkeys(input, divisor, rounds), expected)
+      assertEquals(runMonkeys(getInput(file), divisor, rounds), expected)
     }
 
   testDay11("part 1 sample", "day11-sample.txt", 3, 20, 10605)
