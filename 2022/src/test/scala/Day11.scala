@@ -41,17 +41,18 @@ class Day11 extends munit.FunSuite:
         ))
 
   def runMonkeys(monkeys: IndexedSeq[Monkey], worryReduction: Int, rounds: Int): Long =
+    // here is the key trick needed to "keep your worry levels manageable"
     val modulus = monkeys.map(_.behavior.divisor).product
     for round <- 1 to rounds
-        (m, i) <- monkeys.zipWithIndex do
+        m <- monkeys do
       for item <- m.items do
         m.inspected += 1
-        val reducedWorryLevel = (m.behavior.operation(item) / worryReduction) % modulus
+        val newWorryLevel = (m.behavior.operation(item) / worryReduction) % modulus
         val nextMonkey =
-          if reducedWorryLevel % m.behavior.divisor == 0
+          if newWorryLevel % m.behavior.divisor == 0
           then m.behavior.trueMonkey
           else m.behavior.falseMonkey
-        monkeys(nextMonkey).items :+= reducedWorryLevel
+        monkeys(nextMonkey).items :+= newWorryLevel
       m.items = Nil
     monkeys.map(_.inspected).sorted.takeRight(2)
       .map(_.toLong).product
