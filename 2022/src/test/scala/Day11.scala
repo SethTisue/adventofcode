@@ -1,3 +1,6 @@
+// This was so easy/natural to model with mutability -- I don't
+// feel like refactoring it to be purely functional.
+
 class Day11 extends munit.FunSuite:
 
   case class Monkey(
@@ -13,11 +16,11 @@ class Day11 extends munit.FunSuite:
       s match
         case s"$left $middle $right" =>
           n =>
-            val op1 = if left  == "old" then n else left.toLong
-            val op2 = if right == "old" then n else right.toLong
+            val arg1 = if left  == "old" then n else left.toLong
+            val arg2 = if right == "old" then n else right.toLong
             middle match
-              case "+" => op1 + op2
-              case "*" => op1 * op2
+              case "+" => arg1 + arg2
+              case "*" => arg1 * arg2
     def fromString(lines: Array[String]): Monkey =
       Monkey(
         items = lines(1) match { case s"  Starting items: $items" => items.split(", ").map(_.toLong).toList },
@@ -26,12 +29,6 @@ class Day11 extends munit.FunSuite:
         trueMonkey = lines(4) match { case s"    If true: throw to monkey $n" => n.toInt },
         falseMonkey = lines(5) match { case s"    If false: throw to monkey $n" => n.toInt }
       )
-
-  def getInput(file: String): Iterator[Monkey] =
-    io.Source.fromResource(file)
-      .mkString
-      .split("\n\n").iterator
-      .map(section => Monkey.fromString(section.split('\n')))
 
   def runMonkeys(monkeys: collection.mutable.IndexedSeq[Monkey], divisor: Int, rounds: Int): Long =
     val modulus = monkeys.map(_.divisibleBy).product
@@ -50,6 +47,12 @@ class Day11 extends munit.FunSuite:
       .map(_.toLong).product
 
   // testing
+
+  def getInput(file: String): Iterator[Monkey] =
+    io.Source.fromResource(file)
+      .mkString
+      .split("\n\n").iterator
+      .map(section => Monkey.fromString(section.split('\n')))
 
   def testDay11(name: String, file: String, divisor: Int, rounds: Int, expected: Long) =
     test(s"day 11 $name") {
