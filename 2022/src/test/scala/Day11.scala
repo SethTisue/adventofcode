@@ -40,7 +40,7 @@ class Day11 extends munit.FunSuite:
           falseMonkey = lines(5) match { case s"    If false: throw to monkey $n" => n.toInt }
         ))
 
-  def runMonkeys(monkeys: IndexedSeq[Monkey], worryReduction: Int, rounds: Int): Long =
+  def runMonkeys(monkeys: IndexedSeq[Monkey], worryReduction: Int, rounds: Int): Unit =
     // here is the key trick needed to "keep your worry levels manageable"
     val modulus = monkeys.map(_.behavior.divisor).product
     for round <- 1 to rounds
@@ -54,8 +54,6 @@ class Day11 extends munit.FunSuite:
           else m.behavior.falseMonkey
         monkeys(nextMonkey).items :+= newWorryLevel
       m.items = Nil
-    monkeys.map(_.inspected).sorted.takeRight(2)
-      .map(_.toLong).product
 
   // testing
 
@@ -68,7 +66,12 @@ class Day11 extends munit.FunSuite:
 
   def testDay11(name: String, file: String, worryReduction: Int, rounds: Int, expected: Long) =
     test(s"day 11 $name") {
-      assertEquals(runMonkeys(getInput(file), worryReduction, rounds), expected)
+      val monkeys = getInput(file)
+      runMonkeys(monkeys, worryReduction, rounds)
+      val answer =
+        monkeys.map(_.inspected).sorted.takeRight(2)
+          .map(_.toLong).product
+      assertEquals(answer, expected)
     }
 
   testDay11("part 1 sample", "day11-sample.txt", 3, 20, 10605)
