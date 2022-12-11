@@ -1,44 +1,29 @@
 class Day10 extends munit.FunSuite:
 
-  enum Instruction:
-    case Noop
-    case AddX(amount: Int)
+  case class State(x: Int)
 
-  import Instruction.*
+  val initialState = State(x = 1)
 
-  case class State(x: Int, cycle: Int)
-
-  val initialState = State(x = 1, cycle = 1)
-
-  def run(state: State, instruction: Instruction): State =
-    instruction match
-      case Noop =>
-        state.copy(cycle = state.cycle + 1)
-      case AddX(amount) =>
-        state.copy(x = state.x + amount, cycle = state.cycle + 1)
+  def run(state: State, delta: Int): State =
+    state.copy(x = state.x + delta)
 
   // tests
 
   def testDay10(name: String, file: String, expected: Int) =
     test(s"day 10 $name") {
-      val input: Iterator[Instruction] =
+      val input: Iterator[Int] =
         io.Source.fromResource(file)
           .getLines
           .flatMap{
             case "noop" =>
-              List(Noop)
+              List(0)
             case s"addx $amount" =>
-              List(Noop, AddX(amount.toInt))
+              List(0, amount.toInt)
           }
       val states = input.to(LazyList).scanLeft(initialState)(run)
-//      states.foreach(println)
-      import util.chaining.*
       val result =
-        (19 until states.size by 40)
-          .map(states.apply)
-//          .tapEach(println)
-          .map(s => s.cycle * s.x)
-//          .tapEach(println)
+        (20 until states.size by 40)
+          .map(n => states(n - 1).x * n)
           .sum
       assertEquals(result, expected)
     }
