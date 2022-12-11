@@ -23,9 +23,13 @@ class Day10 extends munit.FunSuite:
   // part 2
 
   def imageFrom(deltas: Iterator[Int]): String =
-    val xs = xHistory(deltas)
-    xs.zipWithIndex.map((x, index) => if (x - (index % 40)).abs <= 1 then '#' else '.')
-      .grouped(40).map(_.mkString).filter(_.size == 40).mkString("\n")
+    xHistory(deltas)
+      .zipWithIndex
+      .map((x, index) => if (x - (index % 40)).abs <= 1 then '#' else '.')
+      .grouped(40)
+      .map(_.mkString)
+      .filter(_.size == 40)
+      .mkString("\n")
 
   // part 1 tests
 
