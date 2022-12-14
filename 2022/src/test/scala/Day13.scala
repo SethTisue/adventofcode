@@ -10,24 +10,25 @@ class Day13 extends munit.FunSuite:
     def fromString(s: String): Packet =
       val (result, remaining) = parse(s)
       require(remaining.isEmpty, remaining)
-      require(Packet.toString(result) == s)
+      require(Packet.toString(result) == s, Packet.toString(result))
       result
+    // this is basically parser combinators but handcoded
     def parse(s: String): (Packet, String) =
-      val (digits, more) = s.span(_.isDigit)
+      val (digits, s2) = s.span(_.isDigit)
       if digits.nonEmpty then
-        (Packet.Number(digits.toInt), more)
+        (Packet.Number(digits.toInt), s2)
       else
-        require(s.head == '[', s.head.toString)
+        require(s.head == '[')
         def recurse(s2: String): (List[Packet], String) =
-          if s2.head == ']'
-          then (Nil, s2.tail)
-          else
-            val (next, s3) = parse(s2)
-            val s3b = if s3.head == ',' then s3.tail else s3
-            val (rest, s4) = recurse(s3b)
-            (next :: rest, s4)
-        val (xs, foo) = recurse(s.tail)
-        (Packet.Nested(xs), foo)
+          s2.head match
+            case ',' => recurse(s2.tail)
+            case ']' => (Nil, s2.tail)
+            case _ =>
+              val (next, s3) = parse(s2)
+              val (rest, s4) = recurse(s3)
+              (next :: rest, s4)
+        val (ps, s2) = recurse(s.tail)
+        (Packet.Nested(ps), s2)
 
   def getInput(file: String): Iterator[Packet] =
     io.Source.fromResource(file)
