@@ -48,8 +48,8 @@ class Day14 extends munit.FunSuite:
           point <- pointsFromSegment(end1, end2)
       do grid(point.x)(point.y) = Square.Rock
       if hasFloor then
-        for x <- 0 to width
-        do grid(x)(height) = Square.Rock
+        for x <- 0 until width
+        do grid(x)(height - 1) = Square.Rock
       grid
     def paths: Iterable[Path] =
       io.Source.fromResource(file)
@@ -60,7 +60,7 @@ class Day14 extends munit.FunSuite:
 
   // part 1 tests
 
-  def testDay14(name: String, file: String, expected: Int) =
+  def testDay14Part1(name: String, file: String, expected: Int) =
     test(s"day 14 $name") {
       val grid = getInput(file, hasFloor = false)
       def drop() = dropSand(grid, Point(grid.size / 2, 0))
@@ -69,7 +69,22 @@ class Day14 extends munit.FunSuite:
         expected)
     }
 
-  testDay14("part 1 sample", "day14-sample.txt",  24)
-  testDay14("part 1",        "day14.txt",        964)
+  testDay14Part1("part 1 sample", "day14-sample.txt",  24)
+  testDay14Part1("part 1",        "day14.txt",        964)
+
+  // part 2 tests
+
+  def testDay14Part2(name: String, file: String, expected: Int) =
+    test(s"day 14 $name") {
+      val grid = getInput(file, hasFloor = true)
+      val origin = Point(grid.size / 2, 0)
+      def drop() = dropSand(grid, Point(grid.size / 2, 0))
+      assertEquals(
+        Iterator.continually(drop()).takeWhile(_ => grid(origin.x)(origin.y) == Square.Empty).size,
+        expected)
+    }
+
+  testDay14Part2("part 2 sample", "day14-sample.txt",  93)
+  // testDay14Part2("part 2",        "day14.txt",        964)
 
 end Day14
