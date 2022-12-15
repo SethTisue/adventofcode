@@ -41,7 +41,7 @@ class Day14 extends munit.FunSuite:
           .map(x => Point(x, p1.y)).toList
     def gridFromPaths(paths: Iterable[Path]): Grid =
       val width = 1000
-      val height = paths.flatten.map(_.y).max + 2
+      val height = paths.flatten.map(_.y).max + 3
       val grid = Array.fill(width)(Array.fill(height)(Square.Empty))
       for path <- paths
           List(end1, end2) <- path.sliding(2)
@@ -63,10 +63,10 @@ class Day14 extends munit.FunSuite:
   def testDay14Part1(name: String, file: String, expected: Int) =
     test(s"day 14 $name") {
       val grid = getInput(file, hasFloor = false)
-      def drop() = dropSand(grid, Point(grid.size / 2, 0))
-      assertEquals(
-        Iterator.continually(drop()).takeWhile(_ == true).size,
-        expected)
+      val origin = Point(grid.size / 2, 0)
+      def drop() = dropSand(grid, origin)
+      val drops = Iterator.continually(drop()).takeWhile(_ == true)
+      assertEquals(drops.size, expected)
     }
 
   testDay14Part1("part 1 sample", "day14-sample.txt",  24)
@@ -78,13 +78,14 @@ class Day14 extends munit.FunSuite:
     test(s"day 14 $name") {
       val grid = getInput(file, hasFloor = true)
       val origin = Point(grid.size / 2, 0)
-      def drop() = dropSand(grid, Point(grid.size / 2, 0))
-      assertEquals(
-        Iterator.continually(drop()).takeWhile(_ => grid(origin.x)(origin.y) == Square.Empty).size,
-        expected)
+      def drop() = dropSand(grid, origin)
+      val drops =
+        Iterator.continually(drop())
+          .takeWhile(_ => grid(origin.x)(origin.y) == Square.Empty)
+      assertEquals(drops.size + 1, expected)
     }
 
-  testDay14Part2("part 2 sample", "day14-sample.txt",  93)
-  // testDay14Part2("part 2",        "day14.txt",        964)
+  testDay14Part2("part 2 sample", "day14-sample.txt",    93)
+  testDay14Part2("part 2",        "day14.txt",        32041)
 
 end Day14
