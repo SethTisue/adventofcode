@@ -15,7 +15,7 @@ class Day14 extends munit.FunSuite:
 
   def dropSand(grid: Grid, loc: Point): Boolean = // true if the sand stopped
     val newY = loc.y + 1
-    newY < 200 && {
+    newY < grid.head.size && {
       val candidates = List(loc.x, loc.x - 1, loc.x + 1)
       candidates.find(newX => grid(newX)(newY) == Square.Empty) match
         case Some(newX) =>
@@ -27,7 +27,7 @@ class Day14 extends munit.FunSuite:
 
   // reading the input
 
-  def getInput(file: String): Grid =
+  def getInput(file: String, hasFloor: Boolean): Grid =
     def pathFromString(s: String): Path =
       s.split(" -> ")
         .map{case s"$x,$y" => Point(x.toInt, y.toInt)}
@@ -39,25 +39,33 @@ class Day14 extends munit.FunSuite:
       else
         (p1.x to p2.x by (p2.x - p1.x).sign)
           .map(x => Point(x, p1.y)).toList
-    def gridFromPaths(paths: Iterator[Path]): Grid =
-      val grid = Array.fill(1000)(Array.fill(200)(Square.Empty))
+    def gridFromPaths(paths: Iterable[Path]): Grid =
+      val width = 1000
+      val height = paths.flatten.map(_.y).max + 2
+      val grid = Array.fill(width)(Array.fill(height)(Square.Empty))
       for path <- paths
           List(end1, end2) <- path.sliding(2)
           point <- pointsFromSegment(end1, end2)
       do grid(point.x)(point.y) = Square.Rock
+      if hasFloor then
+        for x <- 0 to width
+        do grid(x)(height) = Square.Rock
       grid
-    gridFromPaths(
+    def paths: Iterable[Path] =
       io.Source.fromResource(file)
         .getLines
-       .map(pathFromString))
+        .map(pathFromString)
+        .to(Iterable)
+    gridFromPaths(paths)
 
   // part 1 tests
 
   def testDay14(name: String, file: String, expected: Int) =
     test(s"day 14 $name") {
-      val grid = getInput(file)
+      val grid = getInput(file, hasFloor = false)
+      def drop() = dropSand(grid, Point(grid.size / 2, 0))
       assertEquals(
-        Iterator.continually(dropSand(grid, Point(500, 0))).takeWhile(_ == true).size,
+        Iterator.continually(drop()).takeWhile(_ == true).size,
         expected)
     }
 
