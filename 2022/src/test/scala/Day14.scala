@@ -35,12 +35,25 @@ class Day14 extends munit.FunSuite:
         grid(point.x)(point.y) = Square.Rock
       grid
 
+    def dropSand(grid: Grid, loc: Point): Boolean = // true if the sand stopped
+      val newY = loc.y + 1
+      newY < 200 && {
+        List(loc.x, loc.x - 1, loc.x + 1).find(newX => grid(newX)(newY) == Square.Empty) match
+          case Some(newX) =>
+            dropSand(grid, Point(newX, newY))
+          case None =>
+            grid(loc.x)(loc.y) = Square.Sand
+            true
+      }
+
     test(s"day 14 $name") {
       val grid = gridFromPaths(getInput(file))
-      assertEquals(grid.flatten.count(_ == Square.Rock), expected)
+      assertEquals(
+        Iterator.continually(dropSand(grid, Point(500, 0))).takeWhile(_ == true).size,
+        expected)
     }
 
-  testDay14("part 1 sample", "day14-sample.txt",  20)  // 24
-  // testDay14("part 1",        "day14.txt",          0)
+  testDay14("part 1 sample", "day14-sample.txt",  24)
+  testDay14("part 1",        "day14.txt",        964)
 
 end Day14
