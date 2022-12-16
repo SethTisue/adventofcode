@@ -1,8 +1,5 @@
 class Day15 extends munit.FunSuite:
 
-  // part 2 takes about 60 seconds
-  override val munitTimeout = scala.concurrent.duration.Duration(120, "s")
-
   // shared code
 
   case class Sensor(x: Int, y: Int, beaconX: Int, beaconY: Int):
