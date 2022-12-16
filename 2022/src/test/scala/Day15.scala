@@ -1,5 +1,8 @@
 class Day15 extends munit.FunSuite:
 
+  // part 2 takes about 60 seconds
+  override val munitTimeout = scala.concurrent.duration.Duration(120, "s")
+
   // shared code
 
   case class Sensor(x: Int, y: Int, beaconX: Int, beaconY: Int):
@@ -28,12 +31,23 @@ class Day15 extends munit.FunSuite:
 
   // part 2
 
-  def findBeacon(sensors: Iterable[Sensor]): (Int, Int) =
-    val wholeGrid = (0 to 20).toSet.flatMap(x => (0 to 20).map(y => (x, y)))
-    def candidates(s: Sensor): Set[(Int, Int)] = wholeGrid
+  def findBeacon(sensors: Iterable[Sensor], bound: Int): (Int, Int) =
+    def candidates(s: Sensor): Iterator[(Int, Int)] =
+      for dx <- (0 to s.radius + 1).iterator
+          point <- Iterator(
+            (s.x + dx, s.y - s.radius - 1 + dx),
+            (s.x - dx, s.y - s.radius - 1 + dx),
+            (s.x + dx, s.y + s.radius + 1 - dx),
+            (s.x - dx, s.y + s.radius + 1 - dx))
+          if inBounds(point)
+      yield point
     def isClear(x: Int, y: Int): Boolean =
       sensors.forall(s => (s.x - x).abs + (s.y - y).abs > s.radius)
-    sensors.flatMap(candidates).find(Function.tupled(isClear)).get
+    def inBounds(point: (Int, Int)): Boolean =
+      point._1 >= 0 && point._2 >= 0 && point._1 <= bound && point._2 <= bound
+    sensors.iterator.flatMap(candidates)
+      .find(Function.tupled(isClear))
+      .get
 
   // part 1 tests
 
@@ -48,13 +62,13 @@ class Day15 extends munit.FunSuite:
 
   // part 2 tests
 
-  def testDay15Part2(name: String, file: String, expected: Long) =
+  def testDay15Part2(name: String, file: String, bound: Int, expected: Long) =
     test(s"day 15 $name") {
-      val (x, y) = findBeacon(getInput(file).to(Iterable))
+      val (x, y) = findBeacon(getInput(file).to(Iterable), bound)
       assertEquals(x * 4000000L + y, expected)
     }
 
-  testDay15Part2("part 2 sample", "day15-sample.txt", 56000011L)
-  // testDay15Part2("part 2",        "day15.txt",        0L)
+  testDay15Part2("part 2 sample", "day15-sample.txt", bound =      20,       56000011L)
+  testDay15Part2("part 2",        "day15.txt",        bound = 4000000, 10229191267339L)
 
 end Day15
