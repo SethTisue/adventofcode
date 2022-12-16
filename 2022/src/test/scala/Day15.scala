@@ -2,9 +2,9 @@ class Day15 extends munit.FunSuite:
 
   // shared code
 
-  case class Sensor(sensorX: Int, sensorY: Int, beaconX: Int, beaconY: Int):
+  case class Sensor(x: Int, y: Int, beaconX: Int, beaconY: Int):
     val radius: Int =
-      (beaconX - sensorX).abs + (beaconY - sensorY).abs
+      (beaconX - x).abs + (beaconY - y).abs
 
   def getInput(file: String): Iterator[Sensor] =
     io.Source.fromResource(file)
@@ -18,8 +18,8 @@ class Day15 extends munit.FunSuite:
 
   def countClearPositions(sensors: Iterable[Sensor], row: Int): Int =
     def cleared(s: Sensor): Range =
-      val clearedRadius = s.radius - (s.sensorY - row).abs
-      (s.sensorX - clearedRadius) to (s.sensorX + clearedRadius)
+      val clearedRadius = s.radius - (s.y - row).abs
+      (s.x - clearedRadius) to (s.x + clearedRadius)
     val beaconXs = sensors.filter(_.beaconY == row).map(_.beaconX).toSet
     sensors.flatMap(cleared)
       .toSet
@@ -29,7 +29,11 @@ class Day15 extends munit.FunSuite:
   // part 2
 
   def findBeacon(sensors: Iterable[Sensor]): (Int, Int) =
-    (14, 11)
+    val wholeGrid = (0 to 20).toSet.flatMap(x => (0 to 20).map(y => (x, y)))
+    def candidates(s: Sensor): Set[(Int, Int)] = wholeGrid
+    def isClear(x: Int, y: Int): Boolean =
+      sensors.forall(s => (s.x - x).abs + (s.y - y).abs > s.radius)
+    sensors.flatMap(candidates).find(Function.tupled(isClear)).get
 
   // part 1 tests
 
