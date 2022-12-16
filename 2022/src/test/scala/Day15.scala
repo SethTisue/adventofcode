@@ -1,10 +1,8 @@
 class Day15 extends munit.FunSuite:
 
   case class Sensor(sensorX: Int, sensorY: Int, beaconX: Int, beaconY: Int):
-    def distance(x: Int, y: Int): Int =
-      (x - sensorX).abs + (y - sensorY).abs
-    def radius: Int =
-      distance(beaconX, beaconY)
+    val radius: Int =
+      (beaconX - sensorX).abs + (beaconY - sensorY).abs
 
   def getInput(file: String): Iterator[Sensor] =
     io.Source.fromResource(file)
@@ -16,22 +14,23 @@ class Day15 extends munit.FunSuite:
 
   def countClearPositions(sensors: Iterable[Sensor], row: Int): Int =
     def cleared(s: Sensor): Range =
-      val yDistance = (s.sensorY - row).abs
-      (s.sensorX - s.radius + yDistance) to (s.sensorX + s.radius - yDistance)
-    sensors.flatMap{s => val result = cleared(s); println(result); result}
+      val clearedRadius = s.radius - (s.sensorY - row).abs
+      (s.sensorX - clearedRadius) to (s.sensorX + clearedRadius)
+    val beaconXs = sensors.filter(_.beaconY == row).map(_.beaconX).toSet
+    sensors.flatMap(cleared)
       .toSet
-      .diff(sensors.filter(_.beaconY == row).map(_.beaconX).toSet)
+      .diff(beaconXs)
       .size
 
   // part 1 tests
 
-  def testDay15(name: String, file: String, expected: Int) =
+  def testDay15(name: String, file: String, row: Int, expected: Int) =
     test(s"day 15 $name") {
-      val answer = countClearPositions(getInput(file).to(Iterable), row = 10)
+      val answer = countClearPositions(getInput(file).to(Iterable), row)
       assertEquals(answer, expected)
     }
 
-  testDay15("part 1 sample", "day15-sample.txt",  26)
-  testDay15("part 1",        "day15.txt",       0)
+  testDay15("part 1 sample", "day15-sample.txt", row =      10,       26)
+  testDay15("part 1",        "day15.txt",        row = 2000000,  5144286)
 
 end Day15
