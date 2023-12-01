@@ -25,7 +25,7 @@ class Day01 extends munit.FunSuite:
   // part 2
 
   def calibrationValuePart2(line: String): Int =
-    val words = Seq("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
+    val words = Seq("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
     val digits = line.tails.toList.init.flatMap: rest =>
       if rest.head.isDigit
       then Some(rest.head - '0')
@@ -33,7 +33,7 @@ class Day01 extends munit.FunSuite:
         val index = words.indexWhere(rest.startsWith)
         if index == -1
         then None
-        else Some(index + 1)
+        else Some(index)
     digits.head * 10 + digits.last
 
   test("day 1 part 2 sample") {
