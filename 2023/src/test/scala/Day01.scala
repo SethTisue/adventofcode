@@ -31,9 +31,10 @@ class Day01 extends munit.FunSuite:
       if rest.head.isDigit
       then Some(rest.head.toString.toInt)
       else
-        Some(words.indexWhere(rest.startsWith))
-          .filter(_ >= 0)
-          .map(_ + 1)
+        val index = words.indexWhere(rest.startsWith)
+        if index == -1
+        then None
+        else Some(index + 1)
     digits.head * 10 + digits.last
 
   test("day 1 part 2 sample") {
