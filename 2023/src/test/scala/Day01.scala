@@ -28,7 +28,7 @@ class Day01 extends munit.FunSuite:
     val words = Seq("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
     val digits = line.tails.toList.init.flatMap: rest =>
       if rest.head.isDigit
-      then Some(rest.head.toString.toInt)
+      then Some(rest.head - '0')
       else
         val index = words.indexWhere(rest.startsWith)
         if index == -1
