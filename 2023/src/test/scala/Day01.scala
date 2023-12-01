@@ -24,9 +24,8 @@ class Day01 extends munit.FunSuite:
 
   // part 2
 
-  val words = Seq("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
-
   def calibrationValuePart2(line: String): Int =
+    val words = Seq("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
     val digits = line.tails.toList.init.flatMap: rest =>
       if rest.head.isDigit
       then Some(rest.head.toString.toInt)
