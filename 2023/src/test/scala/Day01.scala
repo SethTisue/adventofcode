@@ -1,7 +1,3 @@
-// Note that "0" and "zero" are not considered valid numbers in this problem.
-// But they also don't appear in the test inputs, so you can get away with
-// handling them incorrectly -- and that's what I did.
-
 class Day01 extends munit.FunSuite:
 
   def getInput(name: String): List[String] =
@@ -27,6 +23,10 @@ class Day01 extends munit.FunSuite:
   }
 
   // part 2
+
+  // "zero" is not considered a valid number in this problem.
+  // But it also doesn't appear in the test input, so you can get away with
+  // handling it incorrectly -- and that's what I did.
 
   def calibrationValuePart2(line: String): Int =
     val words = Seq("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
