@@ -1,12 +1,12 @@
 class Day02 extends munit.FunSuite:
 
-  case class Game(n: Int, draws: List[Draw]):
-    def isPossible: Boolean =
-      draws.map(_.red).forall(_ <= 12) &&
-        draws.map(_.green).forall(_ <= 13) &&
-        draws.map(_.blue).forall(_ <= 14)
+  // data model
 
+  case class Game(n: Int, draws: List[Draw])
   case class Draw(red: Int, green: Int, blue: Int)
+
+  // reading and parsing
+
   object Draw:
     def fromString(s: String): Draw =
       val pairs = s.split(',').map(_.trim).map:
@@ -30,14 +30,31 @@ class Day02 extends munit.FunSuite:
 
   def part1(name: String): Int =
     getInput(name)
-      .filter(_.isPossible)
+      .filter: game =>
+        game.draws.map(_.red).forall(_ <= 12) &&
+          game.draws.map(_.green).forall(_ <= 13) &&
+          game.draws.map(_.blue).forall(_ <= 14)
       .map(_.n)
       .sum
 
   test("part 1 sample"):
     assertEquals(8, part1("day02-sample.txt"))
-
   test("part 1"):
     assertEquals(2265, part1("day02.txt"))
+
+  // part 2
+
+  def part2(name: String): Int =
+    getInput(name)
+      .map: game =>
+        game.draws.map(_.red).max *
+          game.draws.map(_.green).max *
+          game.draws.map(_.blue).max
+      .sum
+
+  test("part 2 sample"):
+    assertEquals(2286, part2("day02-sample.txt"))
+  test("part 2"):
+    assertEquals(64097, part2("day02.txt"))
 
 end Day02
