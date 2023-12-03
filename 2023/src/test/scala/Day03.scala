@@ -2,10 +2,13 @@ class Day03 extends munit.FunSuite:
 
   /// reading and parsing
 
+  // to aid uniform processing, we add empty rows to the top and
+  // bottom, and we add `...` to the start and end of each row
+
   def getInput(name: String): Vector[String] =
     val rows =
       io.Source.fromResource(name)
-        .getLines.toVector
+        .getLines.toVector.map(line => s"...$line...")
     val emptyRow = ".".repeat(rows.head.size)
     emptyRow +: rows :+ emptyRow
 
@@ -51,5 +54,53 @@ class Day03 extends munit.FunSuite:
     assertEquals(4361, part1("day03-sample.txt"))
   test("part 1"):
     assertEquals(551094, part1("day03.txt"))
+
+  /// part 2
+
+  def part2(name: String): Int =
+    val schematic = getInput(name)
+    schematic.sliding(3)
+      .collect:
+        case Vector(prev, cur, next) =>
+          gearRatios(prev, cur, next).sum
+      .sum
+
+  // if there is a digit at the given position in the string,
+  // return the entire integer that it's a part of
+  def numberAt(row: String, pos: Int): Option[Int] =
+    if !row(pos).isDigit
+    then None
+    else
+      val (part1, part2) = row.splitAt(pos)
+      val digits1 = part1.reverse.takeWhile(_.isDigit).reverse
+      val digits2 = part2.takeWhile(_.isDigit)
+      Some((digits1 ++ digits2).mkString.toInt)
+
+  def gearRatios(prev: String, cur: String, next: String): Vector[Int] =
+    if cur.size < 7
+    then Vector()
+    else if cur(3) != '*'
+      then gearRatios(prev.tail, cur.tail, next.tail)
+      else
+        val left = numberAt(cur, 2)
+        val right = numberAt(cur, 4)
+        val top = numberAt(prev, 3)
+        val bottom = numberAt(next, 3)
+        val topLeft = if top.isDefined then None else numberAt(prev, 2)
+        val topRight = if top.isDefined then None else numberAt(prev, 4)
+        val bottomLeft = if bottom.isDefined then None else numberAt(next, 2)
+        val bottomRight = if bottom.isDefined then None else numberAt(next, 4)
+        val parts =
+          List(left, right, top, bottom, topLeft, topRight, bottomLeft, bottomRight)
+            .flatten
+        def recurse = gearRatios(prev.tail, cur.tail, next.tail)
+        if parts.size == 2
+        then parts.product +: recurse
+        else recurse
+
+  test("part 2 sample"):
+    assertEquals(467835, part2("day03-sample.txt"))
+  test("part 2"):
+    assertEquals(80179647, part2("day03.txt"))
 
 end Day03
