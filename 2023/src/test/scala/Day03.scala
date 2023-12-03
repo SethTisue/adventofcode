@@ -14,6 +14,9 @@ class Day03 extends munit.FunSuite:
 
   /// part 1
 
+  // we loop over the input rows with `.sliding(3)` so we can see
+  // the row above and the row below us
+
   def part1(name: String): Int =
     val schematic = getInput(name)
     schematic.sliding(3)
@@ -24,6 +27,11 @@ class Day03 extends munit.FunSuite:
 
   def isSymbol(c: Char): Boolean =
     c != '.' && !c.isDigit
+
+  // and then we recurse over the tails of the rows. when we see a
+  // number at the start of the current tail, we check if it is
+  // touching a symbol. (and so we need an extra boolean to keep
+  // remember if we just recursed past a symbol)
 
   def partNumbers(prev: String, cur: String, next: String, justSawSymbol: Boolean = false): Vector[Int] =
     if cur.isEmpty
@@ -57,6 +65,9 @@ class Day03 extends munit.FunSuite:
 
   /// part 2
 
+  // this part uses the same structure: `sliding(3)` over rows,
+  // recurse over row tails
+
   def part2(name: String): Int =
     val schematic = getInput(name)
     schematic.sliding(3)
@@ -67,6 +78,7 @@ class Day03 extends munit.FunSuite:
 
   // if there is a digit at the given position in the string,
   // return the entire integer that it's a part of
+
   def numberAt(row: String, pos: Int): Option[Int] =
     if !row(pos).isDigit
     then None
@@ -76,11 +88,20 @@ class Day03 extends munit.FunSuite:
       val digits2 = part2.takeWhile(_.isDigit)
       Some((digits1 ++ digits2).mkString.toInt)
 
+  // the part numbers are never longer than 3 digits, so we
+  // only need to consider rectangles of the form:
+  //   .......
+  //   ...*...
+  //   .......
+  // when we see the * in the center, we look for adjacent numbers
+
   def gearRatios(prev: String, cur: String, next: String): Vector[Int] =
     if cur.size < 7
     then Vector()
-    else if cur(3) != '*'
-      then gearRatios(prev.tail, cur.tail, next.tail)
+    else
+      def recurse = gearRatios(prev.tail, cur.tail, next.tail)
+      if cur(3) != '*'
+      then recurse
       else
         val left = numberAt(cur, 2)
         val right = numberAt(cur, 4)
@@ -93,7 +114,6 @@ class Day03 extends munit.FunSuite:
         val parts =
           List(left, right, top, bottom, topLeft, topRight, bottomLeft, bottomRight)
             .flatten
-        def recurse = gearRatios(prev.tail, cur.tail, next.tail)
         if parts.size == 2
         then parts.product +: recurse
         else recurse
