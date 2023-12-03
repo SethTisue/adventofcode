@@ -1,3 +1,8 @@
+// I don't put this forward as the most elegant solution.
+// I chose to take a rather low-level approach, which didn't
+// result in the most readable code.  It's purely functional,
+// though, and in a natural way.
+
 class Day03 extends munit.FunSuite:
 
   /// reading and parsing
@@ -89,11 +94,10 @@ class Day03 extends munit.FunSuite:
       Some((digits1 ++ digits2).mkString.toInt)
 
   // the part numbers are never longer than 3 digits, so we
-  // only need to consider rectangles of the form:
+  // only need to consider 3x7 rectangles with * at the center:
   //   .......
   //   ...*...
   //   .......
-  // when we see the * in the center, we look for adjacent numbers
 
   def gearRatios(prev: String, cur: String, next: String): Vector[Int] =
     if cur.size < 7
