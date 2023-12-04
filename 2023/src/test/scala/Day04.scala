@@ -2,7 +2,9 @@ class Day04 extends munit.FunSuite:
 
   /// data model
 
-  case class Card(winners: Set[Int], played: Set[Int])
+  case class Card(winners: Set[Int], played: Set[Int]):
+    def score: Int =
+      Math.pow(2, played.intersect(winners).size).toInt / 2
 
   /// reading and parsing
 
@@ -18,16 +20,13 @@ class Day04 extends munit.FunSuite:
   /// part 1
 
   def part1(name: String): Int =
-    getInput(name).map: card =>
-      Math.pow(2, card.played.intersect(card.winners).size).toInt / 2
-    .sum
+    getInput(name).map(_.score).sum
 
   test("part 1 sample"):
     assertEquals(part1("day04-sample.txt"), 13)
   test("part 1"):
     assertEquals(part1("day04.txt"), 24175)
 
-/*
   /// part 2
 
   def part2(name: String): Int =
@@ -35,9 +34,10 @@ class Day04 extends munit.FunSuite:
     0
 
   test("part 2 sample"):
-    assertEquals(0, part2("day04-sample.txt"))
+    assertEquals(part2("day04-sample.txt"), 30)
+/*
   test("part 2"):
-    assertEquals(0, part2("day04.txt"))
+    assertEquals(part2("day04.txt"), 0)
 */
 
 end Day04
