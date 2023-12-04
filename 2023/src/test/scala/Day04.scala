@@ -33,14 +33,13 @@ class Day04 extends munit.FunSuite:
   def part2(name: String): Int =
     val input = getInput(name)
     def recurse(cards: Vector[Card], points: Vector[Int]): Vector[Int] =
-      if cards.isEmpty
+      if cards.tail.isEmpty
       then points
       else
-        val score = cards.head
-        val (win, lose) = (points.tail.take(score), points.tail.drop(score))
-        val newPoints = win.map(_ + points.head) ++ lose
-        points.head +: recurse(cards.tail, newPoints)
-    recurse(input, Vector.fill(input.size)(1)).sum
+        val (win, lose) = points.tail.splitAt(cards.head)
+        points.head +: recurse(cards.tail, win.map(_ + points.head) ++ lose)
+    recurse(input, Vector.fill(input.size)(1))
+      .sum
 
   test("part 2 sample"):
     assertEquals(part2("day04-sample.txt"), 30)
