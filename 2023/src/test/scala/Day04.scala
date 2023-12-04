@@ -4,7 +4,7 @@ class Day04 extends munit.FunSuite:
 
   case class Card(winners: Set[Int], played: Set[Int]):
     def score: Int =
-      Math.pow(2, played.intersect(winners).size).toInt / 2
+      math.pow(2, played.intersect(winners).size).toInt / 2
 
   /// reading and parsing
 
