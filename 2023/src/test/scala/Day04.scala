@@ -2,26 +2,25 @@ class Day04 extends munit.FunSuite:
 
   /// data model
 
-  case class Card(winners: Set[Int], played: Set[Int]):
-    def winCount: Int =
-      played.intersect(winners).size
+  type Card = Int
 
   /// reading and parsing
 
   def getInput(name: String): Vector[Card] =
-    def fromNumberString(s: String): Set[Int] =
+    def parse(s: String): Set[Int] =
       s.split(' ').filter(_.nonEmpty).map(_.toInt).toSet
     io.Source.fromResource(name)
       .getLines.toVector
       .map:
-        case s"Card $_: $xs1 | $xs2" =>
-          Card(fromNumberString(xs1), fromNumberString(xs2))
+        case s"Card $_: $part1 | $part2" =>
+          val (nums1, nums2) = (parse(part1), parse(part2))
+          nums1.intersect(nums2).size
 
   /// part 1
 
   def part1(name: String): Int =
     def score(card: Card): Int =
-      math.pow(2, card.winCount).toInt / 2
+      math.pow(2, card).toInt / 2
     getInput(name).map(score).sum
 
   test("part 1 sample"):
@@ -37,7 +36,7 @@ class Day04 extends munit.FunSuite:
       if cards.isEmpty
       then points
       else
-        val score = cards.head.winCount
+        val score = cards.head
         val (win, lose) = (points.tail.take(score), points.tail.drop(score))
         val newPoints = win.map(_ + points.head) ++ lose
         points.head +: recurse(cards.tail, newPoints)
