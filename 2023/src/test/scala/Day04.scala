@@ -3,8 +3,8 @@ class Day04 extends munit.FunSuite:
   /// data model
 
   case class Card(winners: Set[Int], played: Set[Int]):
-    def score: Int =
-      math.pow(2, played.intersect(winners).size).toInt / 2
+    def winCount: Int =
+      played.intersect(winners).size
 
   /// reading and parsing
 
@@ -20,7 +20,9 @@ class Day04 extends munit.FunSuite:
   /// part 1
 
   def part1(name: String): Int =
-    getInput(name).map(_.score).sum
+    def score(card: Card): Int =
+      math.pow(2, card.winCount).toInt / 2
+    getInput(name).map(score).sum
 
   test("part 1 sample"):
     assertEquals(part1("day04-sample.txt"), 13)
@@ -31,13 +33,19 @@ class Day04 extends munit.FunSuite:
 
   def part2(name: String): Int =
     val input = getInput(name)
-    0
+    def recurse(cards: Vector[Card], points: Vector[Int]): Vector[Int] =
+      if cards.isEmpty
+      then points
+      else
+        val score = cards.head.winCount
+        val (win, lose) = (points.tail.take(score), points.tail.drop(score))
+        val newPoints = win.map(_ + points.head) ++ lose
+        points.head +: recurse(cards.tail, newPoints)
+    recurse(input, Vector.fill(input.size)(1)).sum
 
   test("part 2 sample"):
     assertEquals(part2("day04-sample.txt"), 30)
-/*
   test("part 2"):
-    assertEquals(part2("day04.txt"), 0)
-*/
+    assertEquals(part2("day04.txt"), 18846301)
 
 end Day04
