@@ -11,18 +11,17 @@ class Day05 extends munit.FunSuite:
               mappings("fertilizer").lookup(
                 mappings("soil").lookup(
                   mappings("seed").lookup(seed)))))))
-  case class Mapping(dest: String, ranges: Set[Range]):
+  case class Mapping(dest: String, ranges: Seq[Range]):
    def lookup(n: Long): Long =
-     val z: Option[Range] = ranges.find: range =>
-       range.lookup(n).isDefined
-     z.map(_.lookup(n).get).getOrElse(n)
+     ranges.collectFirst:
+       case range if range.lookup(n) != -1 =>
+         range.lookup(n)
+     .getOrElse(n)
   case class Range(src: Long, length: Int, dest: Long):
-    def lookup(n: Long): Option[Long] =
+    def lookup(n: Long): Long =
       if n >= src && n < src + length
-      then
-        // println(s"$n matches $this}: ${dest + n - src}")
-        Some(dest + n - src)
-      else None
+      then dest + n - src
+      else -1L
 
   /// reading and parsing
 
@@ -41,8 +40,7 @@ class Day05 extends munit.FunSuite:
             lines.tail.map:
               case s"$dest $src $length" =>
                 Range(src.toLong, length.toInt, dest.toLong)
-            .toSet
-          )
+            .toSeq.sortBy(_.src))
     .toMap)
 
   /// part 1
@@ -60,7 +58,7 @@ class Day05 extends munit.FunSuite:
 
   def part2(name: String): Long =
     val almanac = getInput(name)
-    val locs =
+    val locs: Iterator[Long] =
       for case Vector(start, length) <- almanac.seeds.grouped(2)
           _ = println(start)
           seed <- start until (start + length)
