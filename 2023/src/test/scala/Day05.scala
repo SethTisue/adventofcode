@@ -1,5 +1,8 @@
 class Day05 extends munit.FunSuite:
 
+  override val munitTimeout =
+    concurrent.duration.Duration(10, "m")
+
   /// data model
 
   case class Almanac(seeds: Vector[Long], mappings: Map[String, Mapping]):
@@ -12,11 +15,11 @@ class Day05 extends munit.FunSuite:
                 mappings("soil").lookup(
                   mappings("seed").lookup(seed)))))))
   case class Mapping(dest: String, ranges: Seq[Range]):
-   def lookup(n: Long): Long =
-     ranges.collectFirst:
-       case range if range.lookup(n) != -1 =>
-         range.lookup(n)
-     .getOrElse(n)
+    def lookup(n: Long): Long =
+      ranges.collectFirst:
+        case range if range.lookup(n) != -1 =>
+          range.lookup(n)
+      .getOrElse(n)
   case class Range(src: Long, length: Int, dest: Long):
     def lookup(n: Long): Long =
       if n >= src && n < src + length
@@ -58,12 +61,12 @@ class Day05 extends munit.FunSuite:
 
   def part2(name: String): Long =
     val almanac = getInput(name)
-    val locs: Iterator[Long] =
-      for case Vector(start, length) <- almanac.seeds.grouped(2)
-          _ = println(start)
-          seed <- start until (start + length)
-      yield almanac.lookup(seed)
-    locs.min
+    import collection.parallel.CollectionConverters.*
+    (for case Vector(start, length) <- almanac.seeds.grouped(2).toSeq.par
+    yield
+      println(start)
+      (for seed <- (start until (start + length)).iterator
+       yield almanac.lookup(seed)).min).min
 
   test("part 2 sample"):
     assertEquals(part2("day05-sample.txt"), 46L)
