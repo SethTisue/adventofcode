@@ -1,3 +1,11 @@
+// I'm not proud of this code. It's brute-force, and then it got
+// uglier when I needed to make it run faster.  But I don't feel
+// like cleaning it up.
+
+// I can see conceptually how one would avoid brute-forcing, by
+// being smart about ranges, but I also don't feel like redoing
+// it that way.
+
 class Day05 extends munit.FunSuite:
 
   override val munitTimeout =
