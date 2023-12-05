@@ -2,10 +2,20 @@ class Day05 extends munit.FunSuite:
 
   /// data model
 
-  case class Almanac(seeds: Vector[Long], mappings: Map[String, Mapping])
+  case class Almanac(seeds: Vector[Long], mappings: Map[String, Mapping]):
+    def lookup(seed: Long): Long =
+      mappings("humidity").lookup(
+        mappings("temperature").lookup(
+          mappings("light").lookup(
+            mappings("water").lookup(
+              mappings("fertilizer").lookup(
+                mappings("soil").lookup(
+                  mappings("seed").lookup(seed)))))))
   case class Mapping(dest: String, ranges: Set[Range]):
    def lookup(n: Long): Long =
-     ranges.flatMap(_.lookup(n)).headOption.getOrElse(n)
+     val z: Option[Range] = ranges.find: range =>
+       range.lookup(n).isDefined
+     z.map(_.lookup(n).get).getOrElse(n)
   case class Range(src: Long, length: Int, dest: Long):
     def lookup(n: Long): Option[Long] =
       if n >= src && n < src + length
@@ -39,36 +49,27 @@ class Day05 extends munit.FunSuite:
 
   def part1(name: String): Long =
     val almanac = getInput(name)
-    // println(almanac)
-    def seedToSoil(seed: Long): Long =
-      almanac.mappings("seed").lookup(seed)
-    def seedToLocation(seed: Long): Long =
-      val result =
-        almanac.mappings("humidity").lookup(
-          almanac.mappings("temperature").lookup(
-            almanac.mappings("light").lookup(
-              almanac.mappings("water").lookup(
-                almanac.mappings("fertilizer").lookup(
-                  almanac.mappings("soil").lookup(
-                    almanac.mappings("seed").lookup(seed)))))))
-      result
-    almanac.seeds.map(seedToLocation).min
+    almanac.seeds.map(almanac.lookup).min
 
   test("part 1 sample"):
     assertEquals(part1("day05-sample.txt"), 35L)
   test("part 1"):
-    assertEquals(part1("day05.txt"), 0L)
+    assertEquals(part1("day05.txt"), 662197086L)
 
-/*
   /// part 2
 
-  def part2(name: String): Int =
-    0
+  def part2(name: String): Long =
+    val almanac = getInput(name)
+    val locs =
+      for case Vector(start, length) <- almanac.seeds.grouped(2)
+          _ = println(start)
+          seed <- start until (start + length)
+      yield almanac.lookup(seed)
+    locs.min
 
   test("part 2 sample"):
-    assertEquals(part2("day05-sample.txt"), 0)
+    assertEquals(part2("day05-sample.txt"), 46L)
   test("part 2"):
-    assertEquals(part2("day05.txt"), 0)
- */
+    assertEquals(part2("day05.txt"), 0L)
 
 end Day05
