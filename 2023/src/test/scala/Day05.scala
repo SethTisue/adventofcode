@@ -72,13 +72,12 @@ class Day05 extends munit.FunSuite:
     import collection.parallel.CollectionConverters.*
     (for case Vector(start, length) <- almanac.seeds.grouped(2).toSeq.par
     yield
-      println(start)
       (for seed <- (start until (start + length)).iterator
        yield almanac.lookup(seed)).min).min
 
   test("part 2 sample"):
     assertEquals(part2("day05-sample.txt"), 46L)
   test("part 2"):
-    assertEquals(part2("day05.txt"), 0L)
+    assertEquals(part2("day05.txt"), 52510809L)
 
 end Day05
