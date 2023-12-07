@@ -1,7 +1,7 @@
-// This code is okay. The biggest change I'd make, after seeing others'
+// This code is okay. One change I'd make, after seeing others'
 // solutions, is to have `improve`, the method that upgrades a hand by
 // replacing jokers, operate on card counts rather than on the cards
-// themselves.
+// themselves. I didn't think of that.
 
 class Day07 extends munit.FunSuite:
 
@@ -51,7 +51,6 @@ class Day07 extends munit.FunSuite:
       else compareCardWise(cards, h1, h2)
 
   def winnings(input: Vector[(Hand, Bid)])(using Ordering[Hand]): Int =
-    import util.chaining.*
     input
       .sortBy(_._1)
       .map(_._2)
