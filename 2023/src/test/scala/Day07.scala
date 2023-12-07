@@ -18,14 +18,56 @@ class Day07 extends munit.FunSuite:
     Seq(5),             // five of a kind
   )
 
+  def compareByType(h1: Hand, h2: Hand): Int =
+    summon[Ordering[Int]]
+      .compare(
+        types.indexOf(cardCounts(h1)),
+        types.indexOf(cardCounts(h2)))
+
+  def compareCardWise(cards: String, h1: Hand, h2: Hand): Int =
+    if h1.isEmpty
+    then
+      require(h2.isEmpty)
+      0
+    else
+      val result =
+        summon[Ordering[Int]].compare(
+          cards.indexOf(h1.head),
+          cards.indexOf(h2.head))
+      if result != 0
+      then result
+      else compareCardWise(cards, h1.tail, h2.tail)
+
+  def ordering(cards: String): Ordering[Hand] =
+    (h1: Hand, h2: Hand) =>
+      val result = compareByType(h1, h2)
+      if result != 0
+      then result
+      else compareCardWise(cards, h1, h2)
+
   def winnings(input: Vector[(Hand, Bid)])(using Ordering[Hand]): Long =
+    import util.chaining.*
     input
       .sortBy(_._1)
       .map(_._2)
       .zipWithIndex
       .map: (bid, index) =>
-        bid * (index + 1)
+        bid.toLong * (index + 1)
       .sum
+
+  def improve(h: Hand): Hand =
+    if h.mkString == "JJJJJ"
+    then "AAAAA".toSeq
+    else
+      val commonest =
+        h.filterNot(_ == 'J')
+          .groupBy(identity)
+          .maxBy(_._2.size)
+          ._1
+      h.map: card =>
+        if card == 'J'
+        then commonest
+        else card
 
   /// reading & parsing
 
@@ -39,33 +81,8 @@ class Day07 extends munit.FunSuite:
 
   /// part 1
 
-  def part1Ordering(cards: String) =
-    new Ordering[Hand]:
-      def tieBreaker(h1: Hand, h2: Hand): Int =
-        if h1.isEmpty
-        then
-          require(h2.isEmpty)
-          0
-        else
-          val result =
-            summon[Ordering[Int]].compare(
-              cards.indexOf(h1.head),
-              cards.indexOf(h2.head))
-          if result != 0
-          then result
-          else tieBreaker(h1.tail, h2.tail)
-      def compare(h1: Hand, h2: Hand): Int =
-        val result =
-          summon[Ordering[Int]]
-            .compare(
-              types.indexOf(cardCounts(h1)),
-              types.indexOf(cardCounts(h2)))
-        if result != 0
-        then result
-        else tieBreaker(h1, h2)
-
   def part1(name: String): Long =
-    given Ordering[Hand] = part1Ordering("23456789TJQKA")
+    given Ordering[Hand] = ordering("23456789TJQKA")
     winnings(getInput(name))
 
   test("part 1 sample"):
@@ -76,9 +93,14 @@ class Day07 extends munit.FunSuite:
   /// part 2
 
   object part2Ordering extends Ordering[Hand]:
-    val delegate = part1Ordering("J23456789TQKA")
     def compare(h1: Hand, h2: Hand): Int =
-      delegate.compare(h1, h2)
+      val improved1 = improve(h1)
+      val improved2 = improve(h2)
+      val result = compareByType(improved1, improved2)
+      if result != 0
+      then result
+      else
+        compareCardWise("J23456789TQKA", h1, h2)
 
   def part2(name: String): Long =
     given Ordering[Hand] = part2Ordering
@@ -86,9 +108,7 @@ class Day07 extends munit.FunSuite:
 
   test("part 2 sample"):
     assertEquals(part2("day07-sample.txt"), 5905L)
-/*
   test("part 2"):
-    assertEquals(part2("day07.txt"), 0)
- */
+    assertEquals(part2("day07.txt"), 250382098L)
 
 end Day07
