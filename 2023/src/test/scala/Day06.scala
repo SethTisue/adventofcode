@@ -10,7 +10,7 @@ class Day06 extends munit.FunSuite:
        .count:
          _ > record
 
-  /// part 1
+  /// reading and parsing
 
   def getInput(name: String): (Seq[Int], Seq[Int]) =
     val lines = io.Source.fromResource(name).getLines
@@ -18,6 +18,8 @@ class Day06 extends munit.FunSuite:
       val s"$_: $rest" = line: @unchecked
       rest.trim.split("\\s+").map(_.toInt).toVector
     (parse(lines.next()), parse(lines.next()))
+
+  /// part 1
 
   def part1(name: String): Long =
     val (times, records) = getInput(name)
