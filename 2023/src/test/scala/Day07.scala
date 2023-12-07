@@ -1,3 +1,8 @@
+// This code is okay. The biggest change I'd make, after seeing others'
+// solutions, is to have `improve`, the method that upgrades a hand by
+// replacing jokers, operate on card counts rather than on the cards
+// themselves.
+
 class Day07 extends munit.FunSuite:
 
   /// data model
@@ -45,14 +50,14 @@ class Day07 extends munit.FunSuite:
       then result
       else compareCardWise(cards, h1, h2)
 
-  def winnings(input: Vector[(Hand, Bid)])(using Ordering[Hand]): Long =
+  def winnings(input: Vector[(Hand, Bid)])(using Ordering[Hand]): Int =
     import util.chaining.*
     input
       .sortBy(_._1)
       .map(_._2)
       .zipWithIndex
       .map: (bid, index) =>
-        bid.toLong * (index + 1)
+        bid * (index + 1)
       .sum
 
   def improve(h: Hand): Hand =
@@ -81,14 +86,14 @@ class Day07 extends munit.FunSuite:
 
   /// part 1
 
-  def part1(name: String): Long =
+  def part1(name: String): Int =
     given Ordering[Hand] = ordering("23456789TJQKA")
     winnings(getInput(name))
 
   test("part 1 sample"):
-    assertEquals(part1("day07-sample.txt"), 6440L)
+    assertEquals(part1("day07-sample.txt"), 6440)
   test("part 1"):
-    assertEquals(part1("day07.txt"), 248569531L)
+    assertEquals(part1("day07.txt"), 248569531)
 
   /// part 2
 
@@ -102,13 +107,13 @@ class Day07 extends munit.FunSuite:
       else
         compareCardWise("J23456789TQKA", h1, h2)
 
-  def part2(name: String): Long =
+  def part2(name: String): Int =
     given Ordering[Hand] = part2Ordering
     winnings(getInput(name))
 
   test("part 2 sample"):
-    assertEquals(part2("day07-sample.txt"), 5905L)
+    assertEquals(part2("day07-sample.txt"), 5905)
   test("part 2"):
-    assertEquals(part2("day07.txt"), 250382098L)
+    assertEquals(part2("day07.txt"), 250382098)
 
 end Day07
