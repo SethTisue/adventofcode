@@ -1,3 +1,7 @@
+// I think part 2 is probably correct, but takes too long too run
+// (hours? days? I don't know). I assume you can be clever about
+// least common multiples or something like that and make it fast.
+
 import annotation.tailrec
 
 class Day08 extends munit.FunSuite:
