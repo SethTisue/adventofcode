@@ -9,6 +9,17 @@ class Day08 extends munit.FunSuite:
   case class Node(left: String, right: String)
   type Network = Map[String, Node]
 
+  def navigate(moves: Seq[Move], network: Network): LazyList[String] =
+    def recurse(name: String, moves: LazyList[Move]): LazyList[String] =
+      if name == "ZZZ"
+      then LazyList()
+      else
+        val next = moves.head match
+          case Move.Left => network(name).left
+          case Move.Right => network(name).right
+        next #:: recurse(next, moves.tail)
+    recurse("AAA", LazyList.continually(moves).flatten)
+
   /// reading & parsing
 
   def getInput(name: String): (Seq[Move], Network) =
@@ -28,15 +39,7 @@ class Day08 extends munit.FunSuite:
 
   def part1(name: String): Int =
     val (moves, network) = getInput(name)
-    @tailrec def recurse(name: String, moves: LazyList[Move], steps: Int): Int =
-      if name == "ZZZ"
-      then steps
-      else
-        val next = moves.head match
-          case Move.Left => network(name).left
-          case Move.Right => network(name).right
-        recurse(next, moves.tail, steps + 1)
-    recurse("AAA", LazyList.continually(moves).flatten, 0)
+    navigate(moves, network).size
 
   test("part 1 sample"):
     assertEquals(part1("day08-sample.txt"), 6)
