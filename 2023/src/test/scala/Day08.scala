@@ -32,8 +32,7 @@ class Day08 extends munit.FunSuite:
       if name == "ZZZ"
       then steps
       else
-        val move = moves.head
-        val next = move match
+        val next = moves.head match
           case Move.Left => network(name).left
           case Move.Right => network(name).right
         recurse(next, moves.tail, steps + 1)
