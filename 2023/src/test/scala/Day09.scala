@@ -7,8 +7,8 @@ class Day09 extends munit.FunSuite:
     then xs.head
     else
       xs.last + extrapolate(
-        xs.lazyZip(xs.tail)
-          .map((x1, x2) => x2 - x1)
+        xs.tail.lazyZip(xs)
+          .map(_ - _)
           .toSeq)
 
   def extrapolateBack(xs: Seq[Int]): Int =
