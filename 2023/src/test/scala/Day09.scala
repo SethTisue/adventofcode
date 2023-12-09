@@ -11,6 +11,9 @@ class Day09 extends munit.FunSuite:
           .map((x1, x2) => x2 - x1)
           .toSeq)
 
+  def extrapolateBack(xs: Seq[Int]): Int =
+    extrapolate(xs.reverse)
+
   /// reading & parsing
 
   def getInput(name: String): Vector[Vector[Int]] =
@@ -22,11 +25,26 @@ class Day09 extends munit.FunSuite:
   /// part 1
 
   def part1(name: String): Int =
-    getInput(name).map(extrapolate).sum
+    getInput(name)
+      .map(extrapolate)
+      .sum
 
   test("part 1 sample"):
     assertEquals(part1("day09-sample.txt"), 114)
   test("part 1"):
     assertEquals(part1("day09.txt"), 1637452029)
+
+  /// part 2
+
+  def part2(name: String): Int =
+    getInput(name)
+      .map(_.reverse)
+      .map(extrapolate)
+      .sum
+
+  test("part 2 sample"):
+    assertEquals(part2("day09-sample.txt"), 2)
+  test("part 2"):
+    assertEquals(part2("day09.txt"), 908)
 
 end Day09
