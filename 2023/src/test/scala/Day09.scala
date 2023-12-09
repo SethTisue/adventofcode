@@ -13,11 +13,11 @@ class Day09 extends munit.FunSuite:
 
   /// reading & parsing
 
-  def getInput(name: String): Vector[Vector[Int]] =
+  def getInput(name: String): Seq[Seq[Int]] =
     io.Source.fromResource(name)
       .getLines
-      .map(_.split(' ').map(_.toInt).toVector)
-      .toVector
+      .map(_.split(' ').map(_.toInt).toSeq)
+      .toSeq
 
   /// part 1
 
