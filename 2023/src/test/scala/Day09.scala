@@ -11,9 +11,6 @@ class Day09 extends munit.FunSuite:
           .map(_ - _)
           .toSeq)
 
-  def extrapolateBack(xs: Seq[Int]): Int =
-    extrapolate(xs.reverse)
-
   /// reading & parsing
 
   def getInput(name: String): Vector[Vector[Int]] =
