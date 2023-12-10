@@ -65,19 +65,16 @@ class Day10 extends munit.FunSuite:
   /// part 1
 
   def findPipe(grid: Grid): Set[Position] =
-    def nextSquare(cur: Position, prev: Position): Position =
-      val (exit1, exit2) = exits(grid, cur)
-      if exit1 == prev
-      then exit2 else exit1
     val start = startingPosition(grid)
-    val (exit1, _) = exits(grid, start)
-    (Iterator
-      .iterate((start, exit1)): (cur, prev) =>
-        (nextSquare(cur, prev), cur)
-      .map(_(0))
-      .drop(1)
-      .takeWhile(_ != start)
-      .toSet) + start
+    def recurse(cur: Position, prev: Position, seen: Set[Position]): Set[Position] =
+      val next =
+        val (exit1, exit2) = exits(grid, cur)
+        if exit1 == prev
+        then exit2 else exit1
+      if next == start
+      then seen + cur
+      else recurse(next, cur, seen + cur)
+    recurse(start, null, Set())
 
   def part1(name: String): Int =
     val grid = getInput(name)
