@@ -11,22 +11,13 @@ class Day10 extends munit.FunSuite:
     inline def left   = (pos.row, pos.column - 1)
     inline def right  = (pos.row, pos.column + 1)
 
+  // out-of-bounds positions are considered empty
   type Grid = Vector[Vector[Char]]
   extension (grid: Grid)
     def at(pos: Position): Char =
       if grid.isDefinedAt(pos.row) && grid.head.isDefinedAt(pos.column)
       then grid(pos.row)(pos.column)
       else '.'
-    def updated(pos: Position, c: Char): Grid =
-      grid.updated(pos.row, grid(pos.row).updated(pos.column, c))
-
-  /// reading & parsing
-
-  def getInput(name: String): Grid =
-    io.Source.fromResource(name)
-      .getLines
-      .map(_.toVector)
-      .toVector
 
   /// easy logic
 
@@ -51,25 +42,25 @@ class Day10 extends munit.FunSuite:
       case (false, false, true, true) => '-'
       case _ => ??? // impossible if input is well-formed
 
-  def exits(grid: Grid, cur: Position): (Position, Position) =
-    grid.at(cur) match
-      case '|' => (cur.up, cur.down)
-      case '-' => (cur.left, cur.right)
-      case 'L' => (cur.up, cur.right)
-      case 'J' => (cur.up, cur.left)
-      case '7' => (cur.down, cur.left)
-      case 'F' => (cur.down, cur.right)
+  def exits(grid: Grid, pos: Position): (Position, Position) =
+    grid.at(pos) match
+      case '|' => (pos.up, pos.down)
+      case '-' => (pos.left, pos.right)
+      case 'L' => (pos.up, pos.right)
+      case 'J' => (pos.up, pos.left)
+      case '7' => (pos.down, pos.left)
+      case 'F' => (pos.down, pos.right)
       case 'S' =>
-        val cands = Seq(cur.up, cur.down, cur.left, cur.right)
+        val cands = Seq(pos.up, pos.down, pos.left, pos.right)
         val Seq(exit1, exit2) =
           cands.filter: next =>
             grid.at(next) != '.' && locally:
               val (ret1, ret2) = exits(grid, next)
-              ret1 == cur || ret2 == cur
+              ret1 == pos || ret2 == pos
         (exit1, exit2)
 
-  def nextSquare(grid: Grid, cur: Position, prev: Position): Position =
-    val (exit1, exit2) = exits(grid, cur)
+  def nextSquare(grid: Grid, pos: Position, prev: Position): Position =
+    val (exit1, exit2) = exits(grid, pos)
     if exit1 == prev
     then exit2
     else exit1
@@ -114,6 +105,14 @@ class Day10 extends munit.FunSuite:
         state = (next(1), next(3))
       result
     grid.indices.map(countRow).sum
+
+  /// reading & parsing
+
+  def getInput(name: String): Grid =
+    io.Source.fromResource(name)
+      .getLines
+      .map(_.toVector)
+      .toVector
 
   /// part 1
 
