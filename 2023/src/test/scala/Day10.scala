@@ -16,6 +16,8 @@ class Day10 extends munit.FunSuite:
       if grid.indices.contains(pos.row) && grid.head.indices.contains(pos.column)
       then grid(pos.row)(pos.column)
       else '.'
+    def replaceCell(pos: Position, c: Char): Grid =
+      grid.updated(pos(0), grid(pos(0)).updated(pos(1), c))
 
   // returns the position along with the character the 'S' is
   // "concealing" -- the shape of that part of the pipe
@@ -94,8 +96,8 @@ class Day10 extends munit.FunSuite:
   /// part 2
 
   def repair(grid: Grid): Grid =
-    val (_, concealed) = startingPosition(grid)
-    grid.map(row => row.map(cell => if cell == 'S' then concealed else cell))
+    val (start, concealed) = startingPosition(grid)
+    grid.replaceCell(start, concealed)
 
   def part2(name: String): Int =
     val input = getInput(name)
