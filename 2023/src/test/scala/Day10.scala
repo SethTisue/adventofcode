@@ -17,12 +17,29 @@ class Day10 extends munit.FunSuite:
       then grid(pos.row)(pos.column)
       else '.'
 
-  def startingPosition(grid: Grid): Position =
+  // returns the position along with the character the 'S' is
+  // "concealing" -- the shape of that part of the pipe
+  def startingPosition(grid: Grid): (Position, Char) =
     val row = grid.indexWhere(_.contains('S'))
-    (row, grid(row).indexOf('S'))
+    val cur = (row, grid(row).indexOf('S'))
+    val entrances =
+      (exits(grid, cur.up).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(cur),
+       exits(grid, cur.down).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(cur),
+       exits(grid, cur.left).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(cur),
+       exits(grid, cur.right).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(cur)): @unchecked
+    val concealed =
+      (entrances: @unchecked) match
+        case (true, true, false, false) => '|'
+        case (true, false, true, false) => 'J'
+        case (true, false, false, true) => 'L'
+        case (false, true, true, false) => '7'
+        case (false, true, false, true) => 'F'
+        case (false, false, true, true) => '-'
+    (cur, concealed)
 
   def exits(grid: Grid, cur: Position): (Position, Position) =
     grid.at(cur) match
+      case '.' => (null, null)
       case '|' => (cur.up, cur.down)
       case '-' => (cur.left, cur.right)
       case 'L' => (cur.up, cur.right)
@@ -44,6 +61,17 @@ class Day10 extends munit.FunSuite:
     then exit2
     else exit1
 
+  def findPipe(grid: Grid): Seq[Position] =
+    val (start, _) = startingPosition(grid)
+    val (exit1, exit2) = exits(grid, start)
+    start #::
+      LazyList
+        .iterate((start, exit1)): (cur, prev) =>
+          (nextSquare(grid, cur, prev), cur)
+        .map(_(0))
+        .tail
+        .takeWhile(_ != start)
+
   /// reading & parsing
 
   def getInput(name: String): Grid =
@@ -56,11 +84,7 @@ class Day10 extends munit.FunSuite:
 
   def part1(name: String): Int =
     val grid = getInput(name)
-    val start = startingPosition(grid)
-    val (exit1, exit2) = exits(grid, start)
-    val pipe = LazyList.iterate((start, exit1)): (cur, prev) =>
-      (nextSquare(grid, cur, prev), cur)
-    pipe.map(_(0)).map(grid.at).tail.takeWhile(_ != 'S').size / 2 + 1
+    findPipe(grid).size / 2
 
   test("part 1 sample"):
     assertEquals(part1("day10-sample.txt"), 8)
@@ -69,9 +93,34 @@ class Day10 extends munit.FunSuite:
 
   /// part 2
 
+  def repair(grid: Grid): Grid =
+    val (_, concealed) = startingPosition(grid)
+    grid.map(row => row.map(cell => if cell == 'S' then concealed else cell))
+
   def part2(name: String): Int =
-    val grid = getInput(name)
-    0
+    val input = getInput(name)
+    val grid = repair(input)
+    val row: Seq[Char] = grid(0)
+    var result = 0
+    var rowNumber = 0
+    val pipe = findPipe(input)
+    for row <- grid do
+      var state = (false, false, false, false)
+      var columnNumber = 0
+      for cell2 <- row do
+        val cell = if pipe.contains((rowNumber, columnNumber)) then cell2 else '.'
+        val next =
+          cell match
+            case '.' | '-' => (state(1),  state(1), state(3),  state(3))  // flow, flow
+            case '|'       => (state(1), !state(1), state(3), !state(3))  // flip, flip
+            case 'F' | '7' => (state(1),  state(1), state(3), !state(3))  // flow, flip
+            case 'L' | 'J' => (state(1), !state(1), state(3),  state(3))  // flip, flow
+        if next == (true, true, true, true) then
+          result += 1
+        state = next
+        columnNumber += 1
+      rowNumber += 1
+    result
 
   test("part 2 sample"):
     assertEquals(part2("day10-sample.txt"), 1)
@@ -84,6 +133,6 @@ class Day10 extends munit.FunSuite:
   test("part 2 sample 4"):
     assertEquals(part2("day10-sample4.txt"), 10)
   test("part 2"):
-    assertEquals(part2("day10.txt"), 0)
+    assertEquals(part2("day10.txt"), 459)
 
 end Day10
