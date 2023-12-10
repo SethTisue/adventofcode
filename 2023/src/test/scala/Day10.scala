@@ -74,7 +74,7 @@ class Day10 extends munit.FunSuite:
       if next == start
       then seen + cur
       else recurse(next, cur, seen + cur)
-    recurse(start, null, Set())
+    recurse(start, start, Set())
 
   def part1(name: String): Int =
     val grid = getInput(name)
