@@ -54,7 +54,15 @@ class Day10 extends munit.FunSuite:
       case '7' => (pos.down, pos.left)
       case 'F' => (pos.down, pos.right)
 
-  /// tricky logic -- where we have to loop
+  /// reading & parsing
+
+  def getInput(name: String): Grid =
+    io.Source.fromResource(name)
+      .getLines
+      .map(_.toVector)
+      .toVector
+
+  /// part 1
 
   def findPipe(grid: Grid): Set[Position] =
     def nextSquare(cur: Position, prev: Position): Position =
@@ -71,7 +79,18 @@ class Day10 extends munit.FunSuite:
       .takeWhile(_ != start)
       .toSet) + start
 
-  def countGrid(grid: Grid, pipe: Set[Position]): Int =
+  def part1(name: String): Int =
+    val grid = getInput(name)
+    findPipe(grid).size / 2
+
+  test("part 1 sample"):
+    assertEquals(part1("day10-sample.txt"), 8)
+  test("part 1"):
+    assertEquals(part1("day10.txt"), 6828)
+
+  /// part 2
+
+  def countInterior(grid: Grid, pipe: Set[Position]): Int =
     val pipe = findPipe(grid)
     val concealed = findConcealed(grid)
     def countRow(rowNumber: Int): Int =
@@ -99,30 +118,9 @@ class Day10 extends munit.FunSuite:
       result
     grid.indices.map(countRow).sum
 
-  /// reading & parsing
-
-  def getInput(name: String): Grid =
-    io.Source.fromResource(name)
-      .getLines
-      .map(_.toVector)
-      .toVector
-
-  /// part 1
-
-  def part1(name: String): Int =
-    val grid = getInput(name)
-    findPipe(grid).size / 2
-
-  test("part 1 sample"):
-    assertEquals(part1("day10-sample.txt"), 8)
-  test("part 1"):
-    assertEquals(part1("day10.txt"), 6828)
-
-  /// part 2
-
   def part2(name: String): Int =
     val input = getInput(name)
-    countGrid(input, findPipe(input))
+    countInterior(input, findPipe(input))
 
   test("part 2 sample"):
     assertEquals(part2("day10-sample.txt"), 1)
