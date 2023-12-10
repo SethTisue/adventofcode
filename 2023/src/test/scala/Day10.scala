@@ -69,14 +69,21 @@ class Day10 extends munit.FunSuite:
 
   /// part 2
 
-/*
   def part2(name: String): Int =
-    getInput(name).size
+    val grid = getInput(name)
+    0
 
   test("part 2 sample"):
-    assertEquals(part2("day10-sample.txt"), 2)
+    assertEquals(part2("day10-sample.txt"), 1)
+  test("part 2 sample 2a"):
+    assertEquals(part2("day10-sample2a.txt"), 4)
+  test("part 2 sample 2b"):
+    assertEquals(part2("day10-sample2b.txt"), 4)
+  test("part 2 sample 3"):
+    assertEquals(part2("day10-sample3.txt"), 8)
+  test("part 2 sample 4"):
+    assertEquals(part2("day10-sample4.txt"), 10)
   test("part 2"):
-    assertEquals(part2("day10.txt"), 908)
+    assertEquals(part2("day10.txt"), 0)
 
 end Day10
-*/
