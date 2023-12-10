@@ -107,13 +107,13 @@ class Day10 extends munit.FunSuite:
           else '.'
         val next =
           cell match
-            case '.' | '-' => (state(0),  state(0), state(1),  state(1))  // flow, flow
-            case '|'       => (state(0), !state(0), state(1), !state(1))  // flip, flip
-            case 'F' | '7' => (state(0),  state(0), state(1), !state(1))  // flow, flip
-            case 'L' | 'J' => (state(0), !state(0), state(1),  state(1))  // flip, flow
-        if next == (true, true, true, true) then
+            case '.' | '-' => ( state(0),  state(1))
+            case '|'       => (!state(0), !state(1))
+            case 'F' | '7' => ( state(0), !state(1))
+            case 'L' | 'J' => (!state(0),  state(1))
+        if ((state, next)) == ((true, true), (true, true)) then
           result += 1
-        state = (next(1), next(3))
+        state = next
       result
     grid.indices.map(countRow).sum
 
