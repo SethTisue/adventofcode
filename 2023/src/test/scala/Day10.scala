@@ -61,16 +61,16 @@ class Day10 extends munit.FunSuite:
     then exit2
     else exit1
 
-  def findPipe(grid: Grid): Seq[Position] =
+  def findPipe(grid: Grid): Set[Position] =
     val (start, _) = startingPosition(grid)
     val (exit1, exit2) = exits(grid, start)
-    start #::
-      LazyList
-        .iterate((start, exit1)): (cur, prev) =>
-          (nextSquare(grid, cur, prev), cur)
-        .map(_(0))
-        .tail
-        .takeWhile(_ != start)
+    (Iterator
+      .iterate((start, exit1)): (cur, prev) =>
+        (nextSquare(grid, cur, prev), cur)
+      .map(_(0))
+      .drop(1)
+      .takeWhile(_ != start)
+      .toSet) + start
 
   /// reading & parsing
 
@@ -100,24 +100,23 @@ class Day10 extends munit.FunSuite:
   def part2(name: String): Int =
     val input = getInput(name)
     val grid = repair(input)
-    val row: Seq[Char] = grid(0)
     var result = 0
     var rowNumber = 0
     val pipe = findPipe(input)
     for row <- grid do
-      var state = (false, false, false, false)
+      var state = (false, false)  // top half, bottom half
       var columnNumber = 0
       for cell2 <- row do
-        val cell = if pipe.contains((rowNumber, columnNumber)) then cell2 else '.'
+        val cell = if pipe((rowNumber, columnNumber)) then cell2 else '.'
         val next =
           cell match
-            case '.' | '-' => (state(1),  state(1), state(3),  state(3))  // flow, flow
-            case '|'       => (state(1), !state(1), state(3), !state(3))  // flip, flip
-            case 'F' | '7' => (state(1),  state(1), state(3), !state(3))  // flow, flip
-            case 'L' | 'J' => (state(1), !state(1), state(3),  state(3))  // flip, flow
+            case '.' | '-' => (state(0),  state(0), state(1),  state(1))  // flow, flow
+            case '|'       => (state(0), !state(0), state(1), !state(1))  // flip, flip
+            case 'F' | '7' => (state(0),  state(0), state(1), !state(1))  // flow, flip
+            case 'L' | 'J' => (state(0), !state(0), state(1),  state(1))  // flip, flow
         if next == (true, true, true, true) then
           result += 1
-        state = next
+        state = (next(1), next(3))
         columnNumber += 1
       rowNumber += 1
     result
