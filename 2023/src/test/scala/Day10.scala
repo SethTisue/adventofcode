@@ -1,3 +1,5 @@
+import annotation.tailrec
+
 class Day10 extends munit.FunSuite:
 
   /// data model
@@ -66,6 +68,7 @@ class Day10 extends munit.FunSuite:
 
   def findPipe(grid: Grid): Set[Position] =
     val start = startingPosition(grid)
+    @tailrec
     def recurse(cur: Position, prev: Position, seen: Set[Position]): Set[Position] =
       val next =
         val (exit1, exit2) = exits(grid, cur)
