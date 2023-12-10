@@ -1,6 +1,6 @@
 class Day10 extends munit.FunSuite:
 
-  /// core logic
+  /// data model
 
   type Position = (Int, Int)  // row, column
   extension (pos: Position)
@@ -17,19 +17,21 @@ class Day10 extends munit.FunSuite:
       if grid.isDefinedAt(pos.row) && grid.head.isDefinedAt(pos.column)
       then grid(pos.row)(pos.column)
       else '.'
-    def replaceCell(pos: Position, c: Char): Grid =
+    def updated(pos: Position, c: Char): Grid =
       grid.updated(pos.row, grid(pos.row).updated(pos.column, c))
+
+  /// core logic
 
   // returns the position along with the character the 'S' is
   // "concealing" -- the shape of that part of the pipe
   def startingPosition(grid: Grid): (Position, Char) =
     val row = grid.indexWhere(_.contains('S'))
-    val cur = (row, grid(row).indexOf('S'))
+    val start = (row, grid(row).indexOf('S'))
     val entrances =
-      (exits(grid, cur.up).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(cur),
-       exits(grid, cur.down).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(cur),
-       exits(grid, cur.left).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(cur),
-       exits(grid, cur.right).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(cur)): @unchecked
+      (exits(grid, start.up).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(start),
+       exits(grid, start.down).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(start),
+       exits(grid, start.left).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(start),
+       exits(grid, start.right).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(start)): @unchecked
     val concealed =
       (entrances: @unchecked) match
         case (true, true, false, false) => '|'
@@ -38,7 +40,7 @@ class Day10 extends munit.FunSuite:
         case (false, true, true, false) => '7'
         case (false, true, false, true) => 'F'
         case (false, false, true, true) => '-'
-    (cur, concealed)
+    (start, concealed)
 
   def exits(grid: Grid, cur: Position): (Position, Position) =
     grid.at(cur) match
@@ -98,7 +100,7 @@ class Day10 extends munit.FunSuite:
 
   def repair(grid: Grid): Grid =
     val (start, concealed) = startingPosition(grid)
-    grid.replaceCell(start, concealed)
+    grid.updated(start, concealed)
 
   def part2(name: String): Int =
     val input = getInput(name)
