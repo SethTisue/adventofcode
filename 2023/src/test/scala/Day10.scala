@@ -20,32 +20,39 @@ class Day10 extends munit.FunSuite:
     def updated(pos: Position, c: Char): Grid =
       grid.updated(pos.row, grid(pos.row).updated(pos.column, c))
 
-  /// core logic
+  /// reading & parsing
 
-  // returns the position along with the character the 'S' is
-  // "concealing" -- the shape of that part of the pipe
-  def startingPosition(grid: Grid): (Position, Char) =
-    val start =
-      val rowNumber = grid.indexWhere(_.contains('S'))
-      (rowNumber, grid(rowNumber).indexOf('S'))
-    val entrances =
-      (exits(grid, start.up).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(start),
-       exits(grid, start.down).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(start),
-       exits(grid, start.left).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(start),
-       exits(grid, start.right).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(start)): @unchecked
-    val concealed =
-      (entrances: @unchecked) match
-        case (true, true, false, false) => '|'
-        case (true, false, true, false) => 'J'
-        case (true, false, false, true) => 'L'
-        case (false, true, true, false) => '7'
-        case (false, true, false, true) => 'F'
-        case (false, false, true, true) => '-'
-    (start, concealed)
+  def getInput(name: String): Grid =
+    io.Source.fromResource(name)
+      .getLines
+      .map(_.toVector)
+      .toVector
+
+  /// easy logic
+
+  def startingPosition(grid: Grid): Position =
+    val rowNumber = grid.indexWhere(_.contains('S'))
+    (rowNumber, grid(rowNumber).indexOf('S'))
+
+  // returns the character the 'S' is "concealing" -- the shape
+  // of that part of the pipe
+  def findConcealed(grid: Grid): Char =
+    val start = startingPosition(grid)
+    val topOpen    = "|7F".contains(grid.at(start.up))
+    val bottomOpen = "|JL".contains(grid.at(start.down))
+    val leftOpen   = "-FL".contains(grid.at(start.left))
+    val rightOpen  = "-J7".contains(grid.at(start.right))
+    (topOpen, bottomOpen, leftOpen, rightOpen) match
+      case (true, true, false, false) => '|'
+      case (true, false, true, false) => 'J'
+      case (true, false, false, true) => 'L'
+      case (false, true, true, false) => '7'
+      case (false, true, false, true) => 'F'
+      case (false, false, true, true) => '-'
+      case _ => ??? // impossible if input is well-formed
 
   def exits(grid: Grid, cur: Position): (Position, Position) =
     grid.at(cur) match
-      case '.' => (null, null)
       case '|' => (cur.up, cur.down)
       case '-' => (cur.left, cur.right)
       case 'L' => (cur.up, cur.right)
@@ -67,8 +74,10 @@ class Day10 extends munit.FunSuite:
     then exit2
     else exit1
 
+  /// tricky logic
+
   def findPipe(grid: Grid): Set[Position] =
-    val (start, _) = startingPosition(grid)
+    val start = startingPosition(grid)
     val (exit1, exit2) = exits(grid, start)
     (Iterator
       .iterate((start, exit1)): (cur, prev) =>
@@ -78,13 +87,33 @@ class Day10 extends munit.FunSuite:
       .takeWhile(_ != start)
       .toSet) + start
 
-  /// reading & parsing
-
-  def getInput(name: String): Grid =
-    io.Source.fromResource(name)
-      .getLines
-      .map(_.toVector)
-      .toVector
+  def countGrid(grid: Grid, pipe: Set[Position]): Int =
+    val pipe = findPipe(grid)
+    val concealed = findConcealed(grid)
+    def countRow(rowNumber: Int): Int =
+      val row = grid(rowNumber)
+      var result = 0
+      var state = (false, false)  // top half, bottom half
+      for columnNumber <- row.indices do
+        val pos = (rowNumber, columnNumber)
+        val cell =
+          val value = grid.at(pos)
+          if value == 'S'
+          then concealed
+          else if pipe(pos)
+          then value
+          else '.'
+        val next =
+          cell match
+            case '.' | '-' => (state(0),  state(0), state(1),  state(1))  // flow, flow
+            case '|'       => (state(0), !state(0), state(1), !state(1))  // flip, flip
+            case 'F' | '7' => (state(0),  state(0), state(1), !state(1))  // flow, flip
+            case 'L' | 'J' => (state(0), !state(0), state(1),  state(1))  // flip, flow
+        if next == (true, true, true, true) then
+          result += 1
+        state = (next(1), next(3))
+      result
+    grid.indices.map(countRow).sum
 
   /// part 1
 
@@ -99,33 +128,9 @@ class Day10 extends munit.FunSuite:
 
   /// part 2
 
-  def repair(grid: Grid): Grid =
-    val (start, concealed) = startingPosition(grid)
-    grid.updated(start, concealed)
-
   def part2(name: String): Int =
     val input = getInput(name)
-    val grid = repair(input)
-    val pipe = findPipe(input)
-    def countRow(rowNumber: Int): Int =
-      val row = grid(rowNumber)
-      var result = 0
-      var state = (false, false)  // top half, bottom half
-      for columnNumber <- row.indices do
-        val pos = (rowNumber, columnNumber)
-        val cell = if pipe(pos) then grid.at(pos) else '.'
-        val next =
-          cell match
-            case '.' | '-' => (state(0),  state(0), state(1),  state(1))  // flow, flow
-            case '|'       => (state(0), !state(0), state(1), !state(1))  // flip, flip
-            case 'F' | '7' => (state(0),  state(0), state(1), !state(1))  // flow, flip
-            case 'L' | 'J' => (state(0), !state(0), state(1),  state(1))  // flip, flow
-        if next == (true, true, true, true) then
-          result += 1
-        state = (next(1), next(3))
-      result
-    (for rowNumber <- grid.indices
-     yield countRow(rowNumber)).sum
+    countGrid(input, findPipe(input))
 
   test("part 2 sample"):
     assertEquals(part2("day10-sample.txt"), 1)
