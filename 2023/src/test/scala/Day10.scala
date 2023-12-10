@@ -25,8 +25,9 @@ class Day10 extends munit.FunSuite:
   // returns the position along with the character the 'S' is
   // "concealing" -- the shape of that part of the pipe
   def startingPosition(grid: Grid): (Position, Char) =
-    val row = grid.indexWhere(_.contains('S'))
-    val start = (row, grid(row).indexOf('S'))
+    val start =
+      val rowNumber = grid.indexWhere(_.contains('S'))
+      (rowNumber, grid(rowNumber).indexOf('S'))
     val entrances =
       (exits(grid, start.up).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(start),
        exits(grid, start.down).productIterator.toSeq.asInstanceOf[Seq[Position]].contains(start),
