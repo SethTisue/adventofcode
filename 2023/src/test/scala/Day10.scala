@@ -100,14 +100,14 @@ class Day10 extends munit.FunSuite:
   def part2(name: String): Int =
     val input = getInput(name)
     val grid = repair(input)
-    var result = 0
-    var rowNumber = 0
     val pipe = findPipe(input)
-    for row <- grid do
+    def countRow(rowNumber: Int): Int =
+      val row = grid(rowNumber)
+      var result = 0
       var state = (false, false)  // top half, bottom half
-      var columnNumber = 0
-      for cell2 <- row do
-        val cell = if pipe((rowNumber, columnNumber)) then cell2 else '.'
+      for columnNumber <- row.indices do
+        val pos = (rowNumber, columnNumber)
+        val cell = if pipe(pos) then grid.at(pos) else '.'
         val next =
           cell match
             case '.' | '-' => (state(0),  state(0), state(1),  state(1))  // flow, flow
@@ -117,9 +117,9 @@ class Day10 extends munit.FunSuite:
         if next == (true, true, true, true) then
           result += 1
         state = (next(1), next(3))
-        columnNumber += 1
-      rowNumber += 1
-    result
+      result
+    (for rowNumber <- grid.indices
+     yield countRow(rowNumber)).sum
 
   test("part 2 sample"):
     assertEquals(part2("day10-sample.txt"), 1)
