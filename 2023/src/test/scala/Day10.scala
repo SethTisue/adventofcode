@@ -19,7 +19,7 @@ class Day10 extends munit.FunSuite:
       then grid(pos.row)(pos.column)
       else '.'
 
-  /// easy logic
+  /// easy logic (tedious, but straightforward)
 
   def startingPosition(grid: Grid): Position =
     val rowNumber = grid.indexWhere(_.contains('S'))
