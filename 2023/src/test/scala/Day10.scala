@@ -43,36 +43,29 @@ class Day10 extends munit.FunSuite:
       case _ => ??? // impossible if input is well-formed
 
   def exits(grid: Grid, pos: Position): (Position, Position) =
-    grid.at(pos) match
-      case '|' => (pos.up, pos.down)
+    val cell = grid.at(pos) match
+      case 'S' => findConcealed(grid)
+      case x => x
+    cell match
+      case '|' => (pos.up,   pos.down)
       case '-' => (pos.left, pos.right)
-      case 'L' => (pos.up, pos.right)
-      case 'J' => (pos.up, pos.left)
+      case 'L' => (pos.up,   pos.right)
+      case 'J' => (pos.up,   pos.left)
       case '7' => (pos.down, pos.left)
       case 'F' => (pos.down, pos.right)
-      case 'S' =>
-        val cands = Seq(pos.up, pos.down, pos.left, pos.right)
-        val Seq(exit1, exit2) =
-          cands.filter: next =>
-            grid.at(next) != '.' && locally:
-              val (ret1, ret2) = exits(grid, next)
-              ret1 == pos || ret2 == pos
-        (exit1, exit2)
 
-  def nextSquare(grid: Grid, pos: Position, prev: Position): Position =
-    val (exit1, exit2) = exits(grid, pos)
-    if exit1 == prev
-    then exit2
-    else exit1
-
-  /// tricky logic
+  /// tricky logic -- where we have to loop
 
   def findPipe(grid: Grid): Set[Position] =
+    def nextSquare(cur: Position, prev: Position): Position =
+      val (exit1, exit2) = exits(grid, cur)
+      if exit1 == prev
+      then exit2 else exit1
     val start = startingPosition(grid)
-    val (exit1, exit2) = exits(grid, start)
+    val (exit1, _) = exits(grid, start)
     (Iterator
       .iterate((start, exit1)): (cur, prev) =>
-        (nextSquare(grid, cur, prev), cur)
+        (nextSquare(cur, prev), cur)
       .map(_(0))
       .drop(1)
       .takeWhile(_ != start)
