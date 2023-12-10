@@ -94,10 +94,9 @@ class Day10 extends munit.FunSuite:
     val pipe = findPipe(grid)
     val concealed = findConcealed(grid)
     def countRow(rowNumber: Int): Int =
-      val row = grid(rowNumber)
       var result = 0
       var state = (false, false)  // top half, bottom half
-      for columnNumber <- row.indices do
+      for columnNumber <- grid(rowNumber).indices do
         val pos = (rowNumber, columnNumber)
         val cell =
           val value = grid.at(pos)
