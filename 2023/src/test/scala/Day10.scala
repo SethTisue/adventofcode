@@ -90,7 +90,7 @@ class Day10 extends munit.FunSuite:
 
   /// part 2
 
-  def countInterior(grid: Grid, pipe: Set[Position]): Int =
+  def countInterior(grid: Grid): Int =
     val pipe = findPipe(grid)
     val concealed = findConcealed(grid)
     def countRow(rowNumber: Int): Int =
@@ -118,8 +118,7 @@ class Day10 extends munit.FunSuite:
     grid.indices.map(countRow).sum
 
   def part2(name: String): Int =
-    val input = getInput(name)
-    countInterior(input, findPipe(input))
+    countInterior(getInput(name))
 
   test("part 2 sample"):
     assertEquals(part2("day10-sample.txt"), 1)
