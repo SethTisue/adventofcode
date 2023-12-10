@@ -114,7 +114,9 @@ class Day10 extends munit.FunSuite:
         if ((state, next)) == ((true, true), (true, true)) then
           result += 1
         state = next
+      end for
       result
+    end countRow
     grid.indices.map(countRow).sum
 
   def part2(name: String): Int =
