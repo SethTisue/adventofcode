@@ -2,22 +2,23 @@ class Day10 extends munit.FunSuite:
 
   /// core logic
 
-  type Grid = Vector[Vector[Char]]
   type Position = (Int, Int)  // row, column
   extension (pos: Position)
-    def row = pos(0)
-    def column = pos(1)
-    def up    = (pos(0) - 1, pos(1))
-    def down  = (pos(0) + 1, pos(1))
-    def left  = (pos(0), pos(1) - 1)
-    def right = (pos(0), pos(1) + 1)
+    inline def row    = pos(0)
+    inline def column = pos(1)
+    inline def up     = (pos.row - 1, pos.column)
+    inline def down   = (pos.row + 1, pos.column)
+    inline def left   = (pos.row, pos.column - 1)
+    inline def right  = (pos.row, pos.column + 1)
+
+  type Grid = Vector[Vector[Char]]
   extension (grid: Grid)
     def at(pos: Position): Char =
-      if grid.indices.contains(pos.row) && grid.head.indices.contains(pos.column)
+      if grid.isDefinedAt(pos.row) && grid.head.isDefinedAt(pos.column)
       then grid(pos.row)(pos.column)
       else '.'
     def replaceCell(pos: Position, c: Char): Grid =
-      grid.updated(pos(0), grid(pos(0)).updated(pos(1), c))
+      grid.updated(pos.row, grid(pos.row).updated(pos.column, c))
 
   // returns the position along with the character the 'S' is
   // "concealing" -- the shape of that part of the pipe
