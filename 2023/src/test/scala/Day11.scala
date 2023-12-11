@@ -23,15 +23,13 @@ class Day11 extends munit.FunSuite:
   /// part 1
 
   def expand(universe: Universe, factor: Long): Universe =
-    val minRow = universe.map(_(0)).min
     val maxRow = universe.map(_(0)).max
     val emptyRows =
-      minRow.to(maxRow).filterNot(r => universe.exists(_(0) == r))
+      0L.to(maxRow).filterNot(r => universe.exists(_(0) == r))
     println(("emptyRows", emptyRows))
-    val minCol = universe.map(_(1)).min
     val maxCol = universe.map(_(1)).max
     val emptyCols =
-      minCol.to(maxCol).filterNot(r => universe.exists(_(1) == r))
+      0L.to(maxCol).filterNot(r => universe.exists(_(1) == r))
     println(("emptyCols", emptyCols))
     for (row, col) <- universe
     yield (row + (factor - 1) * (emptyRows.count(_ < row)),
