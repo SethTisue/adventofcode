@@ -28,32 +28,28 @@ class Day11 extends munit.FunSuite:
       0L.to(maxRow).filterNot(r => universe.exists(_(0) == r))
     val maxCol = universe.map(_(1)).max
     val emptyCols =
-      0L.to(maxCol).filterNot(r => universe.exists(_(1) == r))
+      0L.to(maxCol).filterNot(c => universe.exists(_(1) == c))
     for (row, col) <- universe
     yield (row + (factor - 1) * (emptyRows.count(_ < row)),
            col + (factor - 1) * (emptyCols.count(_ < col)))
 
-  def part1(name: String, factor: Long): Long =
+  def allDistancesSum(name: String, factor: Long): Long =
     val universe = expand(getInput(name), factor)
-    (for
-      tail <- universe.tails
-      if tail.nonEmpty
-      galaxy1 = tail.head
-      galaxy2 <- tail.tail
-    yield manhattanDistance(galaxy1, galaxy2)).sum
+    (for case Seq(p1, p2) <- universe.combinations(2)
+     yield manhattanDistance(p1, p2)).sum
 
   test("part 1 sample"):
-    assertEquals(part1("day11-sample.txt", 2), 374L)
+    assertEquals(allDistancesSum("day11-sample.txt", 2), 374L)
   test("part 1"):
-    assertEquals(part1("day11.txt", 2), 9556712L)
+    assertEquals(allDistancesSum("day11.txt", 2), 9556712L)
 
   /// part 2
 
   test("part 2 sample 1"):
-    assertEquals(part1("day11-sample.txt", 10), 1030L)
+    assertEquals(allDistancesSum("day11-sample.txt", 10), 1030L)
   test("part 2 sample 2"):
-    assertEquals(part1("day11-sample.txt", 100), 8410L)
+    assertEquals(allDistancesSum("day11-sample.txt", 100), 8410L)
   test("part 2"):
-    assertEquals(part1("day11.txt", 100000), 678626199476L)
+    assertEquals(allDistancesSum("day11.txt", 1_000_000L), 678626199476L)
 
 end Day11
