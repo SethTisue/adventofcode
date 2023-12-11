@@ -26,27 +26,21 @@ class Day11 extends munit.FunSuite:
     val maxRow = universe.map(_(0)).max
     val emptyRows =
       0L.to(maxRow).filterNot(r => universe.exists(_(0) == r))
-    println(("emptyRows", emptyRows))
     val maxCol = universe.map(_(1)).max
     val emptyCols =
       0L.to(maxCol).filterNot(r => universe.exists(_(1) == r))
-    println(("emptyCols", emptyCols))
     for (row, col) <- universe
     yield (row + (factor - 1) * (emptyRows.count(_ < row)),
            col + (factor - 1) * (emptyCols.count(_ < col)))
 
   def part1(name: String, factor: Long): Long =
     val universe = expand(getInput(name), factor)
-    val distances =
-      for
-        tail <- universe.tails.toSeq
-        if tail.nonEmpty
-        galaxy1 = tail.head
-        galaxy2 <- tail.tail
-      yield
-        manhattanDistance(galaxy1, galaxy2)
-    println(distances)
-    distances.sum
+    (for
+      tail <- universe.tails
+      if tail.nonEmpty
+      galaxy1 = tail.head
+      galaxy2 <- tail.tail
+    yield manhattanDistance(galaxy1, galaxy2)).sum
 
   test("part 1 sample"):
     assertEquals(part1("day11-sample.txt", 2), 374L)
@@ -60,8 +54,6 @@ class Day11 extends munit.FunSuite:
   test("part 2 sample 2"):
     assertEquals(part1("day11-sample.txt", 100), 8410L)
   test("part 2"):
-    assertEquals(part1("day11.txt", 1000000), 0L)
-
-// incorrect: 67869999476
+    assertEquals(part1("day11.txt", 100000), 678626199476L)
 
 end Day11
