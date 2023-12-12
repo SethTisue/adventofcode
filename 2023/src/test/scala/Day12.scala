@@ -2,6 +2,8 @@ class Day12 extends munit.FunSuite:
 
   /// core logic
 
+  // `seen` is how many #s in a row we have just seen
+
   val matches: (Vector[Char], Vector[Int], Int) => Long =
     Memo.memoize: (states, counts, seen) =>
       if states.isEmpty
