@@ -1,35 +1,29 @@
-/*
-???.### 1,1,3
-.??..??...?##. 1,1,3
-?#?#?#?#?#?#?#? 1,3,1,6
-????.#...#... 4,1,1
-????.######..#####. 1,6,5
-?###???????? 3,2,1
-*/
-
 class Day12 extends munit.FunSuite:
 
   /// core logic
 
-  def matches(states: Vector[Char], counts: Vector[Int]): Int =
+  def matches(states: Vector[Char], counts: Vector[Int], seen: Int = 0): Int =
     if states.isEmpty
     then
-      if counts.isEmpty
+      if (seen == 0 && counts.isEmpty) || counts == Vector(seen)
       then 1
       else 0
     else states.head match
       case '.' =>
-        matches(states.tail, counts)
+        if counts.headOption.contains(seen)
+        then matches(states.tail, counts.tail)
+        else if seen == 0
+        then matches(states.tail, counts)
+        else 0
       case '#' =>
-        val firstCount = counts.head
-        if firstCount == 0
+        if counts.headOption.contains(seen)
         then 0
-        else matches(states.tail, (firstCount - 1) +: counts.tail)
+        else matches(states.tail, counts, seen + 1)
       case '?' =>
-        matches('#' +: states.tail, counts) +
-          matches('.' +: states.tail, counts)
+        matches('#' +: states.tail, counts, seen) +
+          matches('.' +: states.tail, counts, seen)
       case c =>
-        throw new RuntimeException(s"invalid input char: $c")
+        require(false, s"invalid: $c"); ???
 
   /// reading & parsing
 
@@ -48,26 +42,14 @@ class Day12 extends munit.FunSuite:
 
   def part1(name: String): Int =
     getInput(name)
-      .tapEach(println)
       .map: (states, counts) =>
         matches(states, counts)
-      .tapEach(println)
       .sum
-  test("part 1 sample"):
-    assertEquals(part1("day12-sample.txt"), 21)
-/*
+  test("part 1 sample 1"):
+    assertEquals(part1("day12-sample1.txt"), 6)
+  test("part 1 sample 2"):
+    assertEquals(part1("day12-sample2.txt"), 21)
   test("part 1"):
-    assertEquals(part1("day12.txt"), 0)
-
-  /// part 2
-
-  def part2(name: String): Int =
-    getInput(name).size
-
-  test("part 2 sample"):
-    assertEquals(part2("day12-sample.txt"), 0)
-  test("part 2"):
-    assertEquals(part2("day12.txt"), 0)
-*/
+    assertEquals(part1("day12.txt"), 7361)
 
 end Day12
