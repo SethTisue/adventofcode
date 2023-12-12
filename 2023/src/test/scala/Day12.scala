@@ -45,11 +45,23 @@ class Day12 extends munit.FunSuite:
       .map: (states, counts) =>
         matches(states, counts)
       .sum
-  test("part 1 sample 1"):
-    assertEquals(part1("day12-sample1.txt"), 6)
-  test("part 1 sample 2"):
-    assertEquals(part1("day12-sample2.txt"), 21)
+  test("part 1 sample"):
+    assertEquals(part1("day12-sample.txt"), 21)
   test("part 1"):
     assertEquals(part1("day12.txt"), 7361)
+
+  /// part 2
+
+  def part2(name: String): Int =
+    getInput(name)
+      .map: (states, counts) =>
+        println((states, counts))
+        matches(Vector.fill(5)('?' +: states).flatten.tail, Vector.fill(5)(counts).flatten)
+      .sum
+
+  test("part 2 sample"):
+    assertEquals(part2("day12-sample.txt"), 525152)
+  test("part 2"):
+    assertEquals(part2("day12.txt"), 0)
 
 end Day12
