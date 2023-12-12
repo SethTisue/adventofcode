@@ -2,30 +2,29 @@ class Day12 extends munit.FunSuite:
 
   /// core logic
 
-  lazy val matches: (Vector[Char], Vector[Int], Int) => Long =
-    Memo.memoize:
-      (states: Vector[Char], counts: Vector[Int], seen: Int) =>
-        if states.isEmpty
-        then
-          if (seen == 0 && counts.isEmpty) || counts == Vector(seen)
-          then 1L
+  val matches: (Vector[Char], Vector[Int], Int) => Long =
+    Memo.memoize: (states, counts, seen) =>
+      if states.isEmpty
+      then
+        if (seen == 0 && counts.isEmpty) || counts == Vector(seen)
+        then 1L
+        else 0L
+      else states.head match
+        case '.' =>
+          if counts.headOption.contains(seen)
+          then matches(states.tail, counts.tail, 0)
+          else if seen == 0L
+          then matches(states.tail, counts, 0)
           else 0L
-        else states.head match
-          case '.' =>
-            if counts.headOption.contains(seen)
-            then matches(states.tail, counts.tail, 0)
-            else if seen == 0L
-            then matches(states.tail, counts, 0)
-            else 0L
-          case '#' =>
-            if counts.headOption.contains(seen)
-            then 0L
-            else matches(states.tail, counts, seen + 1)
-          case '?' =>
-            matches('#' +: states.tail, counts, seen) +
-              matches('.' +: states.tail, counts, seen)
-          case c =>
-            require(false, s"invalid: $c"); ???
+        case '#' =>
+          if counts.headOption.contains(seen)
+          then 0L
+          else matches(states.tail, counts, seen + 1)
+        case '?' =>
+          matches('#' +: states.tail, counts, seen) +
+            matches('.' +: states.tail, counts, seen)
+        case c =>
+          require(false, s"invalid: $c"); ???
 
   /// reading & parsing
 
@@ -57,7 +56,9 @@ class Day12 extends munit.FunSuite:
   def part2(name: String): Long =
     getInput(name)
       .map: (states, counts) =>
-        matches(Vector.fill(5)('?' +: states).flatten.tail, Vector.fill(5)(counts).flatten, 0)
+        matches(
+          Vector.fill(5)('?' +: states).flatten.tail,
+          Vector.fill(5)(counts).flatten, 0)
       .sum
 
   test("part 2 sample"):
