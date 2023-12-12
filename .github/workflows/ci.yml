@@ -8,6 +8,8 @@ jobs:
   test:
     strategy:
       fail-fast: false
+      matrix:
+        year: [2021, 2022, 2023]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -20,9 +22,5 @@ jobs:
       with:
         distribution: temurin
         java-version: 21
-    - name: Test 2021
-      run: cd 2021 && sbt test
-    - name: Test 2022
-      run: cd 2022 && sbt test
-    - name: Test 2023
-      run: cd 2023 && sbt test
+    - name: Test
+      run: cd ${{matrix.year}} && sbt test
