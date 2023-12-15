@@ -21,18 +21,18 @@ class Day15 extends munit.FunSuite:
   case class Lens(label: String, focalLength: Int)
   enum Instruction:
     case Remove(label: String)
-    case Put(label: String, focalLength: Int)
+    case Put(lens: Lens)
   object Instruction:
     def fromString(s: String): Instruction =
       s match
-        case s"$s=$n" => Instruction.Put(s, n.toInt)
+        case s"$s=$n" => Instruction.Put(Lens(s, n.toInt))
         case s"$s-" => Instruction.Remove(s)
         case _ => throw new RuntimeException(s"invalid input: $s")
 
   /// part 1 driver and tests
 
   def part1(name: String): Int =
-    getInput(name).map(hash(_)).sum
+    getInput(name).map(hash).sum
 
   test("part 1 sample"):
     assertEquals(part1("day15-sample.txt"), 1320)
@@ -44,7 +44,7 @@ class Day15 extends munit.FunSuite:
   def update(state: State, instr: Instruction): State =
     val label = instr match
       case Instruction.Remove(label) => label
-      case Instruction.Put(label, _) => label
+      case Instruction.Put(Lens(label, _)) => label
     val boxNumber = hash(label)
     val box = state(boxNumber)
     val idx = box.indexWhere(_.label == label)
@@ -56,7 +56,7 @@ class Day15 extends munit.FunSuite:
               box
             case idx =>
               box.patch(idx, Nil, 1)
-        case Instruction.Put(label, focalLength) =>
+        case Instruction.Put(Lens(label, focalLength)) =>
           idx match
             case -1 =>
               box :+ Lens(label, focalLength)
