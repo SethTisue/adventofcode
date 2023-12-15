@@ -17,6 +17,7 @@ class Day99 extends munit.FunSuite:
 
   test("part 1 sample"):
     assertEquals(part1("day99-sample.txt"), 0)
+/*
   test("part 1"):
     assertEquals(part1("day99.txt"), 0)
 
@@ -29,6 +30,7 @@ class Day99 extends munit.FunSuite:
     assertEquals(part2("day99-sample.txt"), 0)
   test("part 2"):
     assertEquals(part2("day99.txt"), 0)
+*/
 
 end Day99
 */
