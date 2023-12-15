@@ -40,9 +40,7 @@ class Day14 extends munit.FunSuite:
 
   def part1(name: String): Int =
     getInput(name)
-      .tapEach(println)
       .map(roll)
-      .tapEach(println)
       .map(score)
       .sum
 
