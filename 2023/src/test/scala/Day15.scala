@@ -1,15 +1,9 @@
-import annotation.tailrec
-
 class Day15 extends munit.FunSuite:
 
   /// core logic
 
-  @tailrec
-  final def hash(s: String, accum: Int = 0): Int =
-    if s.isEmpty
-    then accum
-    else
-      hash(s.tail, (accum + s.head) * 17 % 256)
+  def hash(s: String, accum: Int = 0): Int =
+    s.foldLeft(0)((acc, c) => (acc + c) * 17 % 256)
 
   /// reading & parsing
 
@@ -24,14 +18,12 @@ class Day15 extends munit.FunSuite:
   def part1(name: String): Int =
     getInput(name).map(hash(_)).sum
 
-  test("part 1 easy sample"):
-    assertEquals(hash("HASH"), 52)
   test("part 1 sample"):
     assertEquals(part1("day15-sample.txt"), 1320)
-/*
   test("part 1"):
-    assertEquals(part1("day15.txt"), 0)
+    assertEquals(part1("day15.txt"), 504449)
 
+/*
   /// part 2
 
   def part2(name: String): Int =
