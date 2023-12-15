@@ -14,7 +14,7 @@ class Day15 extends munit.FunSuite:
     s.foldLeft(0): (acc, c) =>
       (acc + c) * 17 % 256
 
-  /// part 2 core logic
+  /// part 2 data model and parsing
 
   type State = IndexedSeq[Box]
   type Box = IndexedSeq[Lens]
