@@ -10,8 +10,9 @@ class Day15 extends munit.FunSuite:
 
   /// part 1 core logic
 
-  def hash(s: String, accum: Int = 0): Int =
-    s.foldLeft(0)((acc, c) => (acc + c) * 17 % 256)
+  def hash(s: String): Int =
+    s.foldLeft(0): (acc, c) =>
+      (acc + c) * 17 % 256
 
   /// part 2 core logic
 
