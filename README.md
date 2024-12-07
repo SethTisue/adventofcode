@@ -4,4 +4,4 @@
 
 # Other solutions in Scala
 
-see https://scalacenter.github.io/scala-advent-of-code/2022/
+see https://scalacenter.github.io/scala-advent-of-code/
