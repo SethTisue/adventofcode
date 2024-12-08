@@ -37,12 +37,12 @@ class Day08 extends munit.FunSuite:
 
   def part1(name: String): Int =
     val board = getInput(name)
-    val as =
+    val results =
       for (a1, a2) <- board.pairs
           anti1 = board.antinodes(a1, a2).drop(1).head
           anti2 = board.antinodes(a2, a1).drop(1).head
       yield Set(anti1, anti2).filter(board.inBounds)
-    as.flatten.size
+    results.flatten.size
 
   test("part 1 sample"):
     assertEquals(part1("day08-sample.txt"), 14)
@@ -53,12 +53,12 @@ class Day08 extends munit.FunSuite:
 
   def part2(name: String): Int =
     val board = getInput(name)
-    val as =
+    val results =
       for (a1, a2) <- board.pairs
           antis1 = board.antinodes(a1, a2).takeWhile(board.inBounds)
           antis2 = board.antinodes(a2, a1).takeWhile(board.inBounds)
       yield (antis1.toSet ++ antis2.toSet)
-    as.flatten.size
+    results.flatten.size
 
   test("part 2 sample"):
     assertEquals(part2("day08-sample.txt"), 34)
