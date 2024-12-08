@@ -2,7 +2,7 @@ class Day08 extends munit.FunSuite:
 
   /// core logic
 
-  type Position = (Int, Int)
+  type Position = (Int, Int)  // row, column
 
   case class Antenna(pos: Position, frequency: Char)
 
@@ -16,8 +16,9 @@ class Day08 extends munit.FunSuite:
           if a1.frequency == a2.frequency && a1 != a2
       yield (a1, a2)
     def antinodes(a1: Antenna, a2: Antenna): LazyList[Position] =
-      LazyList.iterate((a2.pos._1, a2.pos._2)){case (r, c) =>
-        (r + a2.pos._1 - a1.pos._1, c + a2.pos._2 - a1.pos._2)}
+      LazyList.iterate((a2.pos._1, a2.pos._2)): pos =>
+        (pos._1 + a2.pos._1 - a1.pos._1, pos._2 + a2.pos._2 - a1.pos._2)
+      .takeWhile(inBounds)
 
   /// reading & parsing
 
@@ -35,14 +36,21 @@ class Day08 extends munit.FunSuite:
 
   /// part 1
 
-  def part1(name: String): Int =
+  def solve(name: String, part1: Boolean): Int =
     val board = getInput(name)
+    def cull(antinodes: LazyList[Position]) =
+      if part1
+      then antinodes.drop(1).take(1)
+      else antinodes
     val results =
       for (a1, a2) <- board.pairs
-          anti1 = board.antinodes(a1, a2).drop(1).head
-          anti2 = board.antinodes(a2, a1).drop(1).head
-      yield Set(anti1, anti2).filter(board.inBounds)
+          anti1 = cull(board.antinodes(a1, a2))
+          anti2 = cull(board.antinodes(a2, a1))
+      yield (anti1 ++ anti2)
     results.flatten.size
+
+  def part1(name: String): Int =
+    solve(name, part1 = true)
 
   test("part 1 sample"):
     assertEquals(part1("day08-sample.txt"), 14)
@@ -52,13 +60,7 @@ class Day08 extends munit.FunSuite:
   /// part 2
 
   def part2(name: String): Int =
-    val board = getInput(name)
-    val results =
-      for (a1, a2) <- board.pairs
-          antis1 = board.antinodes(a1, a2).takeWhile(board.inBounds)
-          antis2 = board.antinodes(a2, a1).takeWhile(board.inBounds)
-      yield (antis1.toSet ++ antis2.toSet)
-    results.flatten.size
+    solve(name, part1 = false)
 
   test("part 2 sample"):
     assertEquals(part2("day08-sample.txt"), 34)
