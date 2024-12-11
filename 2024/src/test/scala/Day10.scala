@@ -37,7 +37,7 @@ class Day10 extends munit.FunSuite:
   def getInput(name: String): Topo =
     io.Source.fromResource(name)
     .getLines
-    .map(_.map(_ - '0').toVector)
+    .map(_.map(_.asDigit).toVector)
     .toVector
 
   /// part 1
