@@ -21,16 +21,6 @@ class Day10 extends munit.FunSuite:
 
   type Graph = Map[Pos, Set[Pos]]
 
-  /// reading & parsing
-
-  def getInput(name: String): Topo =
-    io.Source.fromResource(name)
-    .getLines
-    .map(_.map(_ - '0').toVector)
-    .toVector
-
-  /// part 1
-
   def computeGraph(topo: Topo): Graph =
     def reachables(pos: Pos): Set[Pos] =
       Set((-1, 0), (1, 0), (0, -1), (0, 1))
@@ -41,6 +31,16 @@ class Day10 extends munit.FunSuite:
     topo.positions
     .map(pos => pos -> reachables(pos))
     .toMap
+
+  /// reading & parsing
+
+  def getInput(name: String): Topo =
+    io.Source.fromResource(name)
+    .getLines
+    .map(_.map(_ - '0').toVector)
+    .toVector
+
+  /// part 1
 
   // note that we don't bother memoizing, which means we're doing some
   // redundant computation, but it turns out not to run plenty fast
