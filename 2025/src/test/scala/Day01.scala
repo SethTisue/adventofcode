@@ -1,37 +1,29 @@
 class Day01 extends munit.FunSuite:
 
-  /// core logic
-
-  enum Direction:
-    case Left, Right
-  case class Turn(direction: Direction, distance: Int)
-  object Turn:
-    def parse(s: String): Turn =
-      Turn(
-        s.head match
-          case 'L' => Direction.Left
-          case 'R' => Direction.Right
-        , s.tail.toInt)
-
   /// reading & parsing
 
-  def getInput(name: String): Vector[Turn] =
+  def getInput(name: String): Vector[Int] =
     io.Source.fromResource(name)
       .getLines
-      .map(Turn.parse)
+      .map: line =>
+        val sign = if line.head == 'L' then -1 else 1
+        line.tail.toInt * sign
       .toVector
 
   /// part 1
 
   def part1(name: String): Int =
-    ???
+    getInput(name)
+      .scanLeft(50): (pos, turn) =>
+        (pos + turn + 100) % 100
+      .count(_ == 0)
 
   test("part 1 sample"):
     assertEquals(part1("day01-sample.txt"), 3)
-/*
   test("part 1"):
-    assertEquals(part1("day01.txt"), 0)
+    assertEquals(part1("day01.txt"), 989)
 
+/*
   /// part 2
 
   def part2(name: String): Int =
