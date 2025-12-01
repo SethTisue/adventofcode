@@ -9,18 +9,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        year: [2021, 2022, 2023, 2024]
+        year: [2025, 2024, 2023, 2022, 2021]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Decrypt inputs
       uses: sliteteam/github-action-git-crypt-unlock@1.2.0
       env:
         GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
-    - uses: coursier/cache-action@v6
-    - uses: actions/setup-java@v4
+    - uses: actions/setup-java@v5
       with:
         distribution: temurin
         java-version: 21
+    - uses: sbt/setup-sbt@v1
     - name: Test
       run: cd ${{matrix.year}} && sbt test
